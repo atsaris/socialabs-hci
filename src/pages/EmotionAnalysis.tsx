@@ -61,7 +61,9 @@ const EmotionAnalysis = () => {
         <p className="text-muted-foreground">
           Analyze audience emotional reactions to the discussed context
           {selectedProject && (
-            <span className="text-primary"> — {selectedProject.name}</span>
+            <span className="text-primary"> 
+              — {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+            </span>
           )}
         </p>
       </motion.div>
@@ -115,8 +117,8 @@ const EmotionAnalysis = () => {
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
-                    innerRadius={60}
-                    paddingAngle={2}
+                    innerRadius={0}
+                    paddingAngle={0}
                   >
                     {emotionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -127,6 +129,10 @@ const EmotionAnalysis = () => {
                       backgroundColor: "hsl(222, 47%, 8%)",
                       border: "1px solid hsl(222, 30%, 18%)",
                       borderRadius: "8px",
+                      color: "#fff"
+                    }}
+                    itemStyle={{ 
+                    color: "#fff" // <-- TAMBAHKAN INI (Biar teks list item/data jadi putih)
                     }}
                   />
                   <Legend />
@@ -153,6 +159,10 @@ const EmotionAnalysis = () => {
                       backgroundColor: "hsl(222, 47%, 8%)",
                       border: "1px solid hsl(222, 30%, 18%)",
                       borderRadius: "8px",
+                      color: "#fff"
+                    }}
+                    itemStyle={{ 
+                    color: "#fff" // <-- TAMBAHKAN INI (Biar teks list item/data jadi putih)
                     }}
                   />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>

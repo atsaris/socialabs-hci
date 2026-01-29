@@ -56,7 +56,9 @@ const TrendingTopics = () => {
         <p className="text-muted-foreground">
           Identify the main topics being discussed
           {selectedProject && (
-            <span className="text-primary"> — {selectedProject.name}</span>
+            <span className="text-primary"> 
+              — {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+            </span>
           )}
         </p>
       </motion.div>

@@ -56,21 +56,23 @@ export function AppSidebar() {
               exit={{ opacity: 0 }}
               className="flex items-center gap-3"
             >
-              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-primary-foreground" />
-              </div>
+              <img 
+                   src="/Icon Socialabs.png" 
+                   alt="Socialabs Logo" 
+                   className="w-10 h-10 object-contain" />
               <div>
                 <h1 className="font-bold text-sidebar-foreground">Socialabs</h1>
-                <p className="text-xs text-muted-foreground">Analytics</p>
+                
               </div>
             </motion.div>
           )}
         </AnimatePresence>
         
         {collapsed && (
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center mx-auto">
-            <TrendingUp className="w-6 h-6 text-primary-foreground" />
-          </div>
+           <img 
+                   src="/Icon Socialabs.png" 
+                   alt="Socialabs Logo" 
+                   className="w-10 h-10 object-contain" />
         )}
         
         <button

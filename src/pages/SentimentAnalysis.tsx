@@ -113,7 +113,9 @@ const SentimentAnalysis = () => {
         <p className="text-muted-foreground">
           Analyze audience sentiment towards the discussed context
           {selectedProject && (
-            <span className="text-primary"> — {selectedProject.name}</span>
+            <span className="text-primary"> 
+              — {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+            </span>
           )}
         </p>
       </motion.div>
