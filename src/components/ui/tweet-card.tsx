@@ -12,7 +12,6 @@ interface TweetCardProps {
 const sentimentColors = {
   positive: "border-l-success",
   negative: "border-l-destructive",
-  neutral: "border-l-warning",
 };
 
 const emotionEmojis: Record<string, string> = {
@@ -82,8 +81,7 @@ export function TweetCard({ tweet, className }: TweetCardProps) {
           <span className={cn(
             "text-xs px-2 py-1 rounded-full font-medium",
             tweet.sentiment === "positive" && "bg-success/10 text-success",
-            tweet.sentiment === "negative" && "bg-destructive/10 text-destructive",
-            tweet.sentiment === "neutral" && "bg-warning/10 text-warning"
+            tweet.sentiment === "negative" && "bg-destructive/10 text-destructive"
           )}>
             {tweet.sentiment}
           </span>

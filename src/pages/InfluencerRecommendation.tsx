@@ -2,8 +2,13 @@ import { motion } from "framer-motion";
 import { InfluencerCard } from "@/components/ui/influencer-card";
 import { mockInfluencers } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Crown, TrendingUp, Award } from "lucide-react";
+import { Users, Crown, TrendingUp, Award, HelpCircle } from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const InfluencerRecommendation = () => {
   return (
@@ -15,7 +20,7 @@ const InfluencerRecommendation = () => {
       >
         <h1 className="text-3xl font-bold text-foreground mb-2">Influencer Recommendation</h1>
         <p className="text-muted-foreground">
-          Identifikasi orang-orang yang paling berpengaruh dalam konteks yang dibicarakan
+          Identify the most influential people in the discussed context
         </p>
       </motion.div>
 
@@ -28,7 +33,7 @@ const InfluencerRecommendation = () => {
         />
         <StatCard
           title="Top Influencer"
-          value="@influencer_tech"
+          value="@bobotoh_official"
           icon={Crown}
         />
         <StatCard
@@ -102,7 +107,22 @@ const InfluencerRecommendation = () => {
                   <p className="text-sm text-muted-foreground">@{influencer.username}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-primary">{influencer.influence}/100</p>
+                  <div className="flex items-center gap-1">
+                    <p className="font-bold text-primary">{influencer.influence}/100</p>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[280px] p-3">
+                        <p className="font-medium mb-1">Influence Score</p>
+                        <p className="text-sm text-muted-foreground">
+                          A composite metric calculated from follower count, engagement rate, 
+                          retweet ratio, and topic relevance. Higher scores indicate greater 
+                          influence within the analyzed context.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <p className="text-xs text-muted-foreground">Influence Score</p>
                 </div>
                 <div className="text-right hidden md:block">

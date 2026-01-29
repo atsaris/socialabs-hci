@@ -3,10 +3,23 @@ import { Project, Tweet, Topic, Influencer, Community } from "@/types/project";
 export const mockProjects: Project[] = [
   {
     id: "1",
-    name: "Analisis Pemilu 2024",
+    name: "Persib Bandung",
+    description: "Analisis sentimen dan topik terkait pemain baru Persib Bandung",
+    category: "sports",
+    keywords: ["Layvin Kurzawa"],
+    language: "id",
+    startDate: new Date("2024-01-15"),
+    endDate: new Date("2024-02-15"),
+    status: "active",
+    tweetsCount: 45000,
+    createdAt: new Date("2024-01-15"),
+  },
+  {
+    id: "2",
+    name: "Pemilu 2024",
     description: "Analisis sentimen dan topik terkait pemilihan umum Indonesia 2024",
-    category: "Politik",
-    keywords: ["pemilu", "pilpres", "calon presiden"],
+    category: "politics",
+    keywords: ["pilpres 2024"],
     language: "id",
     startDate: new Date("2024-01-01"),
     endDate: new Date("2024-02-15"),
@@ -14,90 +27,156 @@ export const mockProjects: Project[] = [
     tweetsCount: 125000,
     createdAt: new Date("2024-01-01"),
   },
-  {
-    id: "2",
-    name: "Brand Monitoring - Tech",
-    description: "Monitor brand perception untuk perusahaan teknologi",
-    category: "Bisnis",
-    keywords: ["startup", "tech", "innovation"],
-    language: "en",
-    startDate: new Date("2024-02-01"),
-    endDate: new Date("2024-02-28"),
-    status: "active",
-    tweetsCount: 45000,
-    createdAt: new Date("2024-02-01"),
-  },
 ];
 
+// Mock tweets for Persib Bandung / Layvin Kurzawa project
 export const mockTweets: Tweet[] = [
   {
     id: "1",
-    content: "Sangat antusias dengan perkembangan teknologi AI di Indonesia! Semoga bisa membawa perubahan positif 🚀",
+    content: "Gila sih Layvin Kurzawa main di Persib! Mantan PSG loh, kualitasnya beda banget 🔵🔵 #PersibDay",
     author: {
-      username: "techuser_id",
-      displayName: "Tech Enthusiast",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=tech",
+      username: "bobotoh_sejati",
+      displayName: "Bobotoh Sejati",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=bobotoh",
       verified: true,
     },
-    likes: 1250,
-    retweets: 340,
-    replies: 89,
+    likes: 2850,
+    retweets: 890,
+    replies: 156,
     sentiment: "positive",
     emotion: "joy",
-    topic: "Teknologi AI",
+    topic: "Transfer Pemain",
     createdAt: new Date("2024-02-10"),
   },
   {
     id: "2",
-    content: "Kecewa dengan layanan customer service yang lambat. Harap diperbaiki! 😤",
+    content: "Kurzawa gajinya berapa ya? Jangan sampai Persib rugi, harus produktif dong kalau digaji mahal",
     author: {
-      username: "customer_voice",
-      displayName: "Customer Voice",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=customer",
+      username: "supporter_kritis",
+      displayName: "Supporter Kritis",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=kritis",
       verified: false,
     },
-    likes: 89,
-    retweets: 23,
-    replies: 156,
+    likes: 345,
+    retweets: 67,
+    replies: 234,
     sentiment: "negative",
-    emotion: "anger",
-    topic: "Customer Service",
+    emotion: "fear",
+    topic: "Finansial Klub",
     createdAt: new Date("2024-02-09"),
   },
   {
     id: "3",
-    content: "Netral saja melihat perkembangan situasi saat ini. Perlu data lebih lanjut untuk kesimpulan.",
+    content: "Penampilan debut Kurzawa lumayan, crossing-nya masih tajam. Semoga bisa konsisten!",
     author: {
-      username: "analyst_pro",
-      displayName: "Data Analyst Pro",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=analyst",
+      username: "analis_bola",
+      displayName: "Analis Bola ID",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=analis",
       verified: true,
     },
-    likes: 567,
-    retweets: 120,
-    replies: 45,
-    sentiment: "neutral",
-    emotion: "surprise",
-    topic: "Analisis Data",
+    likes: 1567,
+    retweets: 320,
+    replies: 89,
+    sentiment: "positive",
+    emotion: "joy",
+    topic: "Performa Pemain",
     createdAt: new Date("2024-02-08"),
+  },
+  {
+    id: "4",
+    content: "Kurzawa cedera lagi? Baru main 2x udah absen. Ini yang bikin khawatir, rekam medisnya emang buruk",
+    author: {
+      username: "viking_persib",
+      displayName: "Viking Persib",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=viking",
+      verified: false,
+    },
+    likes: 234,
+    retweets: 45,
+    replies: 178,
+    sentiment: "negative",
+    emotion: "anger",
+    topic: "Cedera Pemain",
+    createdAt: new Date("2024-02-07"),
+  },
+  {
+    id: "5",
+    content: "Dari segi pengalaman, Kurzawa jelas level atas. Pernah juara Ligue 1, main bareng Neymar Mbappe",
+    author: {
+      username: "football_stats",
+      displayName: "Football Statistics",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=stats",
+      verified: true,
+    },
+    likes: 2100,
+    retweets: 567,
+    replies: 123,
+    sentiment: "positive",
+    emotion: "joy",
+    topic: "Transfer Pemain",
+    createdAt: new Date("2024-02-06"),
+  },
+  {
+    id: "6",
+    content: "Manajemen Persib emang beda, bisa datangin pemain sekelas Kurzawa. Liga 1 makin menarik! 🔥",
+    author: {
+      username: "liga1_update",
+      displayName: "Liga 1 Update",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=liga1",
+      verified: true,
+    },
+    likes: 3200,
+    retweets: 890,
+    replies: 234,
+    sentiment: "positive",
+    emotion: "surprise",
+    topic: "Transfer Pemain",
+    createdAt: new Date("2024-02-05"),
   },
 ];
 
+// Topics for Persib Bandung project
 export const mockTopics: Topic[] = [
-  { id: "1", name: "Teknologi AI", keywords: ["AI", "machine learning", "automation"], tweetsCount: 35000, percentage: 28 },
-  { id: "2", name: "Ekonomi Digital", keywords: ["fintech", "e-commerce", "digital payment"], tweetsCount: 28000, percentage: 22 },
-  { id: "3", name: "Kebijakan Pemerintah", keywords: ["regulasi", "kebijakan", "pemerintah"], tweetsCount: 22000, percentage: 18 },
-  { id: "4", name: "Pendidikan", keywords: ["sekolah", "universitas", "belajar"], tweetsCount: 18000, percentage: 14 },
-  { id: "5", name: "Kesehatan", keywords: ["kesehatan", "rumah sakit", "obat"], tweetsCount: 12000, percentage: 10 },
-  { id: "6", name: "Lainnya", keywords: ["misc"], tweetsCount: 10000, percentage: 8 },
+  { 
+    id: "1", 
+    name: "Transfer Pemain", 
+    keywords: ["kurzawa", "transfer", "pemain baru", "PSG"],
+    description: "Diskusi tentang kedatangan Layvin Kurzawa sebagai pemain baru Persib Bandung dari Paris Saint-Germain",
+    tweetsCount: 18500, 
+    percentage: 41 
+  },
+  { 
+    id: "2", 
+    name: "Performa Pemain", 
+    keywords: ["main", "performa", "skill", "crossing"],
+    description: "Analisis performa dan kemampuan teknis Kurzawa di lapangan saat membela Persib",
+    tweetsCount: 12000, 
+    percentage: 27 
+  },
+  { 
+    id: "3", 
+    name: "Finansial Klub", 
+    keywords: ["gaji", "kontrak", "biaya", "mahal"],
+    description: "Pembahasan terkait aspek finansial dan nilai kontrak pemain untuk Persib Bandung",
+    tweetsCount: 8500, 
+    percentage: 19 
+  },
+  { 
+    id: "4", 
+    name: "Cedera Pemain", 
+    keywords: ["cedera", "absen", "recovery", "medis"],
+    description: "Kekhawatiran fans tentang riwayat cedera dan kondisi fisik Kurzawa",
+    tweetsCount: 6000, 
+    percentage: 13 
+  },
 ];
 
 export const mockInfluencers: Influencer[] = [
   {
     id: "1",
-    username: "influencer_tech",
-    displayName: "Tech Influencer ID",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=influencer1",
+    username: "bobotoh_official",
+    displayName: "Bobotoh Official",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=bobotoh_official",
     verified: true,
     followers: 2500000,
     engagement: 4.5,
@@ -106,9 +185,9 @@ export const mockInfluencers: Influencer[] = [
   },
   {
     id: "2",
-    username: "digital_expert",
-    displayName: "Digital Expert",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=influencer2",
+    username: "persib_update",
+    displayName: "Persib Update",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=persib_update",
     verified: true,
     followers: 1800000,
     engagement: 3.8,
@@ -117,9 +196,9 @@ export const mockInfluencers: Influencer[] = [
   },
   {
     id: "3",
-    username: "thought_leader",
-    displayName: "Thought Leader",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=influencer3",
+    username: "viking_persib",
+    displayName: "Viking Persib",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=viking_persib",
     verified: true,
     followers: 950000,
     engagement: 5.2,
@@ -128,9 +207,9 @@ export const mockInfluencers: Influencer[] = [
   },
   {
     id: "4",
-    username: "news_update",
-    displayName: "News Update ID",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=influencer4",
+    username: "liga1_news",
+    displayName: "Liga 1 News",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=liga1_news",
     verified: true,
     followers: 3200000,
     engagement: 2.9,
@@ -140,17 +219,16 @@ export const mockInfluencers: Influencer[] = [
 ];
 
 export const mockCommunities: Community[] = [
-  { id: "1", name: "Tech Enthusiasts", members: 12500, mainTopic: "Teknologi AI", color: "#1DA1F2" },
-  { id: "2", name: "Business Leaders", members: 8900, mainTopic: "Ekonomi Digital", color: "#17BF63" },
-  { id: "3", name: "Policy Watchers", members: 6700, mainTopic: "Kebijakan Pemerintah", color: "#FFAD1F" },
-  { id: "4", name: "Education Advocates", members: 5400, mainTopic: "Pendidikan", color: "#F45D22" },
-  { id: "5", name: "Health Professionals", members: 4200, mainTopic: "Kesehatan", color: "#794BC4" },
+  { id: "1", name: "Bobotoh Core", members: 15200, mainTopic: "Transfer Pemain", color: "#1DA1F2" },
+  { id: "2", name: "Analis Taktik", members: 8900, mainTopic: "Performa Pemain", color: "#17BF63" },
+  { id: "3", name: "Supporter Kritis", members: 6700, mainTopic: "Finansial Klub", color: "#FFAD1F" },
+  { id: "4", name: "Media Olahraga", members: 5400, mainTopic: "Transfer Pemain", color: "#794BC4" },
 ];
 
+// Sentiment data (only positive and negative)
 export const sentimentData = [
-  { name: "Positif", value: 45, color: "hsl(142, 76%, 36%)" },
-  { name: "Negatif", value: 25, color: "hsl(0, 84%, 60%)" },
-  { name: "Netral", value: 30, color: "hsl(38, 92%, 50%)" },
+  { name: "Positive", value: 64, color: "hsl(142, 76%, 36%)" },
+  { name: "Negative", value: 36, color: "hsl(0, 84%, 60%)" },
 ];
 
 export const emotionData = [
@@ -162,12 +240,41 @@ export const emotionData = [
   { name: "Disgust", value: 12, color: "#F45D22" },
 ];
 
-export const trendData = [
-  { date: "1 Feb", tweets: 4500, positive: 2000, negative: 1200, neutral: 1300 },
-  { date: "2 Feb", tweets: 5200, positive: 2400, negative: 1400, neutral: 1400 },
-  { date: "3 Feb", tweets: 4800, positive: 2100, negative: 1300, neutral: 1400 },
-  { date: "4 Feb", tweets: 6100, positive: 2800, negative: 1600, neutral: 1700 },
-  { date: "5 Feb", tweets: 7200, positive: 3400, negative: 1900, neutral: 1900 },
-  { date: "6 Feb", tweets: 6800, positive: 3100, negative: 1800, neutral: 1900 },
-  { date: "7 Feb", tweets: 5900, positive: 2700, negative: 1500, neutral: 1700 },
+// Word cloud data for sentiment
+export const positiveWords = [
+  { text: "keren", count: 1250 },
+  { text: "mantap", count: 980 },
+  { text: "hebat", count: 870 },
+  { text: "bagus", count: 750 },
+  { text: "berkelas", count: 680 },
+  { text: "profesional", count: 590 },
+  { text: "skill", count: 520 },
+  { text: "tajam", count: 480 },
+  { text: "pengalaman", count: 450 },
+  { text: "juara", count: 420 },
+  { text: "luar biasa", count: 380 },
+  { text: "bangga", count: 350 },
+  { text: "semangat", count: 320 },
+  { text: "optimis", count: 290 },
+  { text: "berharap", count: 260 },
 ];
+
+export const negativeWords = [
+  { text: "cedera", count: 890 },
+  { text: "mahal", count: 720 },
+  { text: "khawatir", count: 650 },
+  { text: "ragu", count: 580 },
+  { text: "kecewa", count: 520 },
+  { text: "lambat", count: 450 },
+  { text: "tua", count: 420 },
+  { text: "gagal", count: 380 },
+  { text: "buruk", count: 350 },
+  { text: "rugi", count: 320 },
+  { text: "absen", count: 290 },
+  { text: "risiko", count: 260 },
+];
+
+// Extended Topic interface
+export interface ExtendedTopic extends Topic {
+  description: string;
+}

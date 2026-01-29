@@ -1,27 +1,98 @@
 import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
-import { mockTweets, sentimentData, trendData } from "@/data/mockData";
+import { mockTweets, sentimentData, positiveWords, negativeWords } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ThumbsUp, ThumbsDown, Minus, MessageSquare } from "lucide-react";
-import { 
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid
-} from "recharts";
+import { Heart, ThumbsUp, ThumbsDown, MessageSquare, Tag } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { useState } from "react";
+import { useProject } from "@/context/ProjectContext";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+
+// Word Cloud Component
+const WordCloud = ({ 
+  words, 
+  color, 
+  hoveredWord, 
+  setHoveredWord 
+}: { 
+  words: { text: string; count: number }[]; 
+  color: string;
+  hoveredWord: string | null;
+  setHoveredWord: (word: string | null) => void;
+}) => {
+  const maxCount = Math.max(...words.map(w => w.count));
+  
+  return (
+    <div className="flex flex-wrap gap-2 justify-center items-center p-4 min-h-[200px]">
+      {words.map((word, index) => {
+        const size = 0.7 + (word.count / maxCount) * 1.3;
+        const isHovered = hoveredWord === word.text;
+        
+        return (
+          <motion.div
+            key={word.text}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.05 }}
+            className="relative"
+            onMouseEnter={() => setHoveredWord(word.text)}
+            onMouseLeave={() => setHoveredWord(null)}
+          >
+            <span
+              className={cn(
+                "cursor-pointer transition-all duration-200 font-medium",
+                isHovered && "underline"
+              )}
+              style={{
+                fontSize: `${size}rem`,
+                color: isHovered ? color : `${color}99`,
+              }}
+            >
+              {word.text}
+            </span>
+            {isHovered && (
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-popover border border-border px-2 py-1 rounded text-xs whitespace-nowrap z-10"
+              >
+                {word.count.toLocaleString()} tweets
+              </motion.div>
+            )}
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
 
 const SentimentAnalysis = () => {
   const [selectedSentiment, setSelectedSentiment] = useState<string | null>(null);
+  const [hoveredWord, setHoveredWord] = useState<string | null>(null);
+  const { selectedProject } = useProject();
 
   const filteredTweets = selectedSentiment
     ? mockTweets.filter((t) => t.sentiment === selectedSentiment)
     : mockTweets;
 
   const sentimentStats = [
-    { label: "Positive", value: 45, icon: ThumbsUp, color: "text-success", bg: "bg-success/10" },
-    { label: "Negative", value: 25, icon: ThumbsDown, color: "text-destructive", bg: "bg-destructive/10" },
-    { label: "Neutral", value: 30, icon: Minus, color: "text-warning", bg: "bg-warning/10" },
+    { label: "Positive", value: 64, icon: ThumbsUp, color: "text-success", bg: "bg-success/10" },
+    { label: "Negative", value: 36, icon: ThumbsDown, color: "text-destructive", bg: "bg-destructive/10" },
   ];
+
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      sports: "Sports",
+      politics: "Politics",
+      business: "Business",
+      technology: "Technology",
+      entertainment: "Entertainment",
+      health: "Health",
+      education: "Education",
+    };
+    return labels[category] || category;
+  };
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
@@ -30,14 +101,25 @@ const SentimentAnalysis = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-foreground mb-2">Sentiment Analysis</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold text-foreground">Sentiment Analysis</h1>
+          {selectedProject && (
+            <Badge variant="secondary" className="text-sm">
+              <Tag className="w-3 h-3 mr-1" />
+              {getCategoryLabel(selectedProject.category)}
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground">
-          Analisis keberpihakan audiens terhadap konteks yang dibicarakan
+          Analyze audience sentiment towards the discussed context
+          {selectedProject && (
+            <span className="text-primary"> — {selectedProject.name}</span>
+          )}
         </p>
       </motion.div>
 
       {/* Sentiment Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {sentimentStats.map((stat) => (
           <motion.div
             key={stat.label}
@@ -68,7 +150,7 @@ const SentimentAnalysis = () => {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pie Chart */}
         <Card className="bg-card border-border/50">
           <CardHeader>
@@ -109,45 +191,39 @@ const SentimentAnalysis = () => {
           </CardContent>
         </Card>
 
-        {/* Area Chart - Trend */}
+        {/* Positive Word Cloud */}
         <Card className="bg-card border-border/50">
           <CardHeader>
-            <CardTitle>Sentiment Trend Over Time</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <ThumbsUp className="w-5 h-5 text-success" />
+              Positive Words
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trendData}>
-                  <defs>
-                    <linearGradient id="colorPositive" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorNegative" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorNeutral" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(38, 92%, 50%)" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(38, 92%, 50%)" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" />
-                  <XAxis dataKey="date" stroke="hsl(220, 10%, 60%)" fontSize={12} />
-                  <YAxis stroke="hsl(220, 10%, 60%)" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(222, 47%, 8%)",
-                      border: "1px solid hsl(222, 30%, 18%)",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Area type="monotone" dataKey="positive" stackId="1" stroke="hsl(142, 76%, 36%)" fill="url(#colorPositive)" />
-                  <Area type="monotone" dataKey="negative" stackId="1" stroke="hsl(0, 84%, 60%)" fill="url(#colorNegative)" />
-                  <Area type="monotone" dataKey="neutral" stackId="1" stroke="hsl(38, 92%, 50%)" fill="url(#colorNeutral)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            <WordCloud 
+              words={positiveWords} 
+              color="hsl(142, 76%, 36%)" 
+              hoveredWord={hoveredWord}
+              setHoveredWord={setHoveredWord}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Negative Word Cloud */}
+        <Card className="bg-card border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ThumbsDown className="w-5 h-5 text-destructive" />
+              Negative Words
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WordCloud 
+              words={negativeWords} 
+              color="hsl(0, 84%, 60%)" 
+              hoveredWord={hoveredWord}
+              setHoveredWord={setHoveredWord}
+            />
           </CardContent>
         </Card>
       </div>
@@ -157,11 +233,11 @@ const SentimentAnalysis = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-primary" />
-            Tweets {selectedSentiment && `- ${selectedSentiment.charAt(0).toUpperCase() + selectedSentiment.slice(1)}`}
+            Tweets {selectedSentiment && `— ${selectedSentiment.charAt(0).toUpperCase() + selectedSentiment.slice(1)}`}
             {selectedSentiment && (
               <button
                 onClick={() => setSelectedSentiment(null)}
-                className="text-sm text-primary hover:underline ml-auto"
+                className="text-sm text-primary hover:underline ml-auto font-normal"
               >
                 Clear filter
               </button>

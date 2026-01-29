@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
@@ -19,50 +18,51 @@ import {
   Languages, 
   CalendarDays,
   Search,
-  X,
   Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useProject } from "@/context/ProjectContext";
 
 const steps = [
-  { id: 1, title: "Project Info", icon: FolderPlus, description: "Nama dan deskripsi project" },
-  { id: 2, title: "Category", icon: Tag, description: "Pilih kategori project" },
-  { id: 3, title: "Keywords", icon: Search, description: "Kata kunci pencarian" },
-  { id: 4, title: "Language", icon: Languages, description: "Bahasa tweet" },
-  { id: 5, title: "Date Range", icon: CalendarDays, description: "Rentang waktu" },
-  { id: 6, title: "Review", icon: FileText, description: "Tinjau ulang project" },
+  { id: 1, title: "Project Info", icon: FolderPlus, description: "Project name and description" },
+  { id: 2, title: "Category", icon: Tag, description: "Select project category" },
+  { id: 3, title: "Keyword", icon: Search, description: "Search keyword" },
+  { id: 4, title: "Language", icon: Languages, description: "Tweet language" },
+  { id: 5, title: "Date Range", icon: CalendarDays, description: "Time range" },
+  { id: 6, title: "Review", icon: FileText, description: "Review project details" },
 ];
 
 const categories = [
-  { value: "politik", label: "Politik", emoji: "🏛️" },
-  { value: "bisnis", label: "Bisnis", emoji: "💼" },
-  { value: "teknologi", label: "Teknologi", emoji: "💻" },
-  { value: "olahraga", label: "Olahraga", emoji: "⚽" },
-  { value: "hiburan", label: "Hiburan", emoji: "🎬" },
-  { value: "pendidikan", label: "Pendidikan", emoji: "📚" },
-  { value: "kesehatan", label: "Kesehatan", emoji: "🏥" },
-  { value: "lainnya", label: "Lainnya", emoji: "📌" },
+  { value: "politics", label: "Politics", emoji: "🏛️" },
+  { value: "business", label: "Business", emoji: "💼" },
+  { value: "technology", label: "Technology", emoji: "💻" },
+  { value: "sports", label: "Sports", emoji: "⚽" },
+  { value: "entertainment", label: "Entertainment", emoji: "🎬" },
+  { value: "education", label: "Education", emoji: "📚" },
+  { value: "health", label: "Health", emoji: "🏥" },
+  { value: "others", label: "Others", emoji: "📌" },
 ];
 
 const languages = [
-  { value: "id", label: "Bahasa Indonesia", flag: "🇮🇩" },
+  { value: "id", label: "Indonesian", flag: "🇮🇩" },
   { value: "en", label: "English", flag: "🇺🇸" },
-  { value: "all", label: "Semua Bahasa", flag: "🌐" },
+  { value: "all", label: "All Languages", flag: "🌐" },
 ];
 
 const CreateProject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addProject } = useProject();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     category: "",
-    keywords: [] as string[],
-    keywordInput: "",
+    customCategory: "",
+    keyword: "",
     language: "",
     startDate: undefined as Date | undefined,
     endDate: undefined as Date | undefined,
@@ -80,41 +80,47 @@ const CreateProject = () => {
     }
   };
 
-  const addKeyword = () => {
-    if (formData.keywordInput.trim() && !formData.keywords.includes(formData.keywordInput.trim())) {
-      setFormData({
-        ...formData,
-        keywords: [...formData.keywords, formData.keywordInput.trim()],
-        keywordInput: "",
-      });
-    }
-  };
-
-  const removeKeyword = (keyword: string) => {
-    setFormData({
-      ...formData,
-      keywords: formData.keywords.filter((k) => k !== keyword),
-    });
-  };
-
   const handleSubmit = () => {
+    const newProject = {
+      id: Date.now().toString(),
+      name: formData.name,
+      description: formData.description,
+      category: formData.category === "others" ? formData.customCategory : formData.category,
+      keywords: [formData.keyword],
+      language: formData.language,
+      startDate: formData.startDate!,
+      endDate: formData.endDate!,
+      status: "pending" as const,
+      tweetsCount: 0,
+      createdAt: new Date(),
+    };
+    
+    addProject(newProject);
+    
     toast({
       title: "Project Created! 🎉",
-      description: "Project berhasil dibuat. Proses scraping akan dimulai.",
+      description: "Project has been created successfully. Scraping will begin shortly.",
     });
-    navigate("/");
+    navigate("/projects");
   };
 
   const isStepValid = () => {
     switch (currentStep) {
       case 1: return formData.name.trim() !== "";
-      case 2: return formData.category !== "";
-      case 3: return formData.keywords.length > 0;
+      case 2: return formData.category !== "" && (formData.category !== "others" || formData.customCategory.trim() !== "");
+      case 3: return formData.keyword.trim() !== "";
       case 4: return formData.language !== "";
       case 5: return formData.startDate && formData.endDate;
       case 6: return true;
       default: return false;
     }
+  };
+
+  const getDisplayCategory = () => {
+    if (formData.category === "others") {
+      return formData.customCategory || "Custom";
+    }
+    return categories.find(c => c.value === formData.category)?.label || "-";
   };
 
   return (
@@ -128,7 +134,7 @@ const CreateProject = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Create New Project</h1>
           <p className="text-muted-foreground">
-            Buat project baru untuk menganalisis tweet dari X (Twitter)
+            Create a new project to analyze tweets from X (Twitter)
           </p>
         </div>
 
@@ -203,20 +209,20 @@ const CreateProject = () => {
                 {currentStep === 1 && (
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Nama Project *</Label>
+                      <Label htmlFor="name">Project Name *</Label>
                       <Input
                         id="name"
-                        placeholder="Contoh: Analisis Pemilu 2024"
+                        placeholder="e.g., Persib Bandung Analysis"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="mt-2"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="description">Deskripsi (Opsional)</Label>
+                      <Label htmlFor="description">Description (Optional)</Label>
                       <Textarea
                         id="description"
-                        placeholder="Jelaskan tujuan analisis Anda..."
+                        placeholder="Describe your analysis goals..."
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         className="mt-2 min-h-[120px]"
@@ -227,62 +233,70 @@ const CreateProject = () => {
 
                 {/* Step 2: Category */}
                 {currentStep === 2 && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {categories.map((category) => (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {categories.map((category) => (
+                        <motion.div
+                          key={category.value}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setFormData({ ...formData, category: category.value })}
+                          className={cn(
+                            "p-4 rounded-xl border-2 cursor-pointer transition-all text-center",
+                            formData.category === category.value
+                              ? "border-primary bg-primary/10"
+                              : "border-border hover:border-primary/50"
+                          )}
+                        >
+                          <span className="text-3xl mb-2 block">{category.emoji}</span>
+                          <span className="font-medium text-foreground">{category.label}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Category Input */}
+                    {formData.category === "others" && (
                       <motion.div
-                        key={category.value}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setFormData({ ...formData, category: category.value })}
-                        className={cn(
-                          "p-4 rounded-xl border-2 cursor-pointer transition-all text-center",
-                          formData.category === category.value
-                            ? "border-primary bg-primary/10"
-                            : "border-border hover:border-primary/50"
-                        )}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
                       >
-                        <span className="text-3xl mb-2 block">{category.emoji}</span>
-                        <span className="font-medium text-foreground">{category.label}</span>
+                        <Label htmlFor="customCategory">Custom Category Name *</Label>
+                        <Input
+                          id="customCategory"
+                          placeholder="Enter your category name..."
+                          value={formData.customCategory}
+                          onChange={(e) => setFormData({ ...formData, customCategory: e.target.value })}
+                          className="mt-2"
+                        />
                       </motion.div>
-                    ))}
+                    )}
                   </div>
                 )}
 
-                {/* Step 3: Keywords */}
+                {/* Step 3: Keyword (Single) */}
                 {currentStep === 3 && (
                   <div className="space-y-4">
-                    <div className="flex gap-2">
+                    <div>
+                      <Label htmlFor="keyword">Search Keyword *</Label>
                       <Input
-                        placeholder="Masukkan kata kunci..."
-                        value={formData.keywordInput}
-                        onChange={(e) => setFormData({ ...formData, keywordInput: e.target.value })}
-                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addKeyword())}
+                        id="keyword"
+                        placeholder="Enter a single keyword..."
+                        value={formData.keyword}
+                        onChange={(e) => setFormData({ ...formData, keyword: e.target.value })}
+                        className="mt-2"
                       />
-                      <Button onClick={addKeyword} variant="secondary">
-                        Add
-                      </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2 min-h-[100px] p-4 rounded-xl bg-muted/50">
-                      {formData.keywords.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">
-                          Belum ada kata kunci. Tambahkan minimal satu kata kunci.
-                        </p>
-                      ) : (
-                        formData.keywords.map((keyword) => (
-                          <Badge
-                            key={keyword}
-                            variant="secondary"
-                            className="px-3 py-1.5 text-sm cursor-pointer hover:bg-destructive/10"
-                            onClick={() => removeKeyword(keyword)}
-                          >
-                            {keyword}
-                            <X className="w-3 h-3 ml-2" />
-                          </Badge>
-                        ))
-                      )}
-                    </div>
+                    {formData.keyword && (
+                      <div className="p-4 rounded-xl bg-muted/50">
+                        <p className="text-sm text-muted-foreground mb-2">Your keyword:</p>
+                        <Badge variant="secondary" className="px-3 py-1.5 text-sm">
+                          {formData.keyword}
+                        </Badge>
+                      </div>
+                    )}
                     <p className="text-xs text-muted-foreground">
-                      Tips: Gunakan kata kunci yang spesifik untuk hasil yang lebih akurat.
+                      Tip: Use a specific keyword for more accurate results. Only one keyword per project is allowed.
                     </p>
                   </div>
                 )}
@@ -314,7 +328,7 @@ const CreateProject = () => {
                 {currentStep === 5 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label>Tanggal Mulai *</Label>
+                      <Label>Start Date *</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -325,7 +339,7 @@ const CreateProject = () => {
                             )}
                           >
                             <CalendarDays className="mr-2 h-4 w-4" />
-                            {formData.startDate ? format(formData.startDate, "PPP") : "Pilih tanggal"}
+                            {formData.startDate ? format(formData.startDate, "PPP") : "Select date"}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -340,7 +354,7 @@ const CreateProject = () => {
                       </Popover>
                     </div>
                     <div className="space-y-2">
-                      <Label>Tanggal Akhir *</Label>
+                      <Label>End Date *</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -351,7 +365,7 @@ const CreateProject = () => {
                             )}
                           >
                             <CalendarDays className="mr-2 h-4 w-4" />
-                            {formData.endDate ? format(formData.endDate, "PPP") : "Pilih tanggal"}
+                            {formData.endDate ? format(formData.endDate, "PPP") : "Select date"}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -374,23 +388,21 @@ const CreateProject = () => {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="p-4 rounded-xl bg-muted/50">
-                        <Label className="text-muted-foreground text-xs">Nama Project</Label>
+                        <Label className="text-muted-foreground text-xs">Project Name</Label>
                         <p className="font-medium text-foreground mt-1">{formData.name || "-"}</p>
                       </div>
                       <div className="p-4 rounded-xl bg-muted/50">
-                        <Label className="text-muted-foreground text-xs">Kategori</Label>
-                        <p className="font-medium text-foreground mt-1">
-                          {categories.find(c => c.value === formData.category)?.label || "-"}
-                        </p>
+                        <Label className="text-muted-foreground text-xs">Category</Label>
+                        <p className="font-medium text-foreground mt-1">{getDisplayCategory()}</p>
                       </div>
                       <div className="p-4 rounded-xl bg-muted/50">
-                        <Label className="text-muted-foreground text-xs">Bahasa</Label>
+                        <Label className="text-muted-foreground text-xs">Language</Label>
                         <p className="font-medium text-foreground mt-1">
                           {languages.find(l => l.value === formData.language)?.label || "-"}
                         </p>
                       </div>
                       <div className="p-4 rounded-xl bg-muted/50">
-                        <Label className="text-muted-foreground text-xs">Rentang Waktu</Label>
+                        <Label className="text-muted-foreground text-xs">Date Range</Label>
                         <p className="font-medium text-foreground mt-1">
                           {formData.startDate && formData.endDate
                             ? `${format(formData.startDate, "dd MMM")} - ${format(formData.endDate, "dd MMM yyyy")}`
@@ -399,50 +411,66 @@ const CreateProject = () => {
                       </div>
                     </div>
                     <div className="p-4 rounded-xl bg-muted/50">
-                      <Label className="text-muted-foreground text-xs">Kata Kunci</Label>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {formData.keywords.map((keyword) => (
-                          <Badge key={keyword} variant="secondary">{keyword}</Badge>
-                        ))}
+                      <Label className="text-muted-foreground text-xs">Keyword</Label>
+                      <div className="mt-2">
+                        <Badge variant="secondary">{formData.keyword}</Badge>
                       </div>
                     </div>
                     {formData.description && (
                       <div className="p-4 rounded-xl bg-muted/50">
-                        <Label className="text-muted-foreground text-xs">Deskripsi</Label>
+                        <Label className="text-muted-foreground text-xs">Description</Label>
                         <p className="text-foreground mt-1">{formData.description}</p>
                       </div>
                     )}
+
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="p-6 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-6 h-6 text-primary" />
+                        <div>
+                          <p className="font-medium text-foreground">Ready to Create!</p>
+                          <p className="text-sm text-muted-foreground">
+                            Your project will be created and tweet scraping will begin.
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 pt-6 border-t border-border">
+            <div className="flex justify-between mt-8">
               <Button
                 variant="outline"
                 onClick={handlePrev}
                 disabled={currentStep === 1}
+                className="gap-2"
               >
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Sebelumnya
+                <ChevronLeft className="w-4 h-4" />
+                Previous
               </Button>
-              {currentStep < steps.length ? (
+              
+              {currentStep === steps.length ? (
                 <Button
-                  onClick={handleNext}
-                  disabled={!isStepValid()}
-                  className="gradient-primary text-primary-foreground"
+                  onClick={handleSubmit}
+                  className="gradient-primary text-primary-foreground gap-2"
                 >
-                  Selanjutnya
-                  <ChevronRight className="w-4 h-4 ml-2" />
+                  Create Project
+                  <Check className="w-4 h-4" />
                 </Button>
               ) : (
                 <Button
-                  onClick={handleSubmit}
-                  className="gradient-primary text-primary-foreground"
+                  onClick={handleNext}
+                  disabled={!isStepValid()}
+                  className="gradient-primary text-primary-foreground gap-2"
                 >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Buat Project
+                  Next
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
               )}
             </div>

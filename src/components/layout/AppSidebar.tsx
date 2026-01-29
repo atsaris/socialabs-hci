@@ -1,8 +1,7 @@
 import { 
   LayoutDashboard, 
   FolderPlus, 
-  MessageSquare, 
-  Brain, 
+  TrendingUp, 
   Heart, 
   Smile, 
   Users, 
@@ -10,27 +9,35 @@ import {
   Bot,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  FolderOpen
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProject } from "@/context/ProjectContext";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: FolderPlus, label: "Create Project", path: "/create-project" },
-  { icon: MessageSquare, label: "Topic Modeling", path: "/topics" },
-  { icon: Heart, label: "Sentiment Analysis", path: "/sentiment" },
-  { icon: Smile, label: "Emotion Analysis", path: "/emotion" },
-  { icon: Users, label: "Influencer", path: "/influencer" },
-  { icon: Network, label: "Community Detection", path: "/community" },
-  { icon: Bot, label: "Chatbot", path: "/chatbot" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/", requiresProject: false },
+  { icon: FolderOpen, label: "Projects", path: "/projects", requiresProject: false },
+  { icon: FolderPlus, label: "Create Project", path: "/create-project", requiresProject: false },
+  { icon: TrendingUp, label: "Trending Topics", path: "/trending-topics", requiresProject: true },
+  { icon: Heart, label: "Sentiment Analysis", path: "/sentiment", requiresProject: true },
+  { icon: Smile, label: "Emotion Analysis", path: "/emotion", requiresProject: true },
+  { icon: Users, label: "Influencer", path: "/influencer", requiresProject: true },
+  { icon: Network, label: "Community Detection", path: "/community", requiresProject: true },
+  { icon: Bot, label: "Chatbot", path: "/chatbot", requiresProject: true },
 ];
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { selectedProject } = useProject();
+
+  const visibleMenuItems = menuItems.filter(item => 
+    !item.requiresProject || selectedProject !== null
+  );
 
   return (
     <motion.aside
@@ -50,10 +57,10 @@ export function AppSidebar() {
               className="flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-                <Brain className="w-6 h-6 text-primary-foreground" />
+                <TrendingUp className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="font-bold text-sidebar-foreground">SocialX</h1>
+                <h1 className="font-bold text-sidebar-foreground">Socialabs</h1>
                 <p className="text-xs text-muted-foreground">Analytics</p>
               </div>
             </motion.div>
@@ -62,7 +69,7 @@ export function AppSidebar() {
         
         {collapsed && (
           <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center mx-auto">
-            <Brain className="w-6 h-6 text-primary-foreground" />
+            <TrendingUp className="w-6 h-6 text-primary-foreground" />
           </div>
         )}
         
@@ -79,9 +86,17 @@ export function AppSidebar() {
         </button>
       </div>
 
+      {/* Selected Project Indicator */}
+      {selectedProject && !collapsed && (
+        <div className="px-3 py-3 border-b border-sidebar-border">
+          <p className="text-xs text-muted-foreground mb-1">Selected Project</p>
+          <p className="text-sm font-medium text-primary truncate">{selectedProject.name}</p>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <NavLink
