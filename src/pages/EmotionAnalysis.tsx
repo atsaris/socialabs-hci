@@ -2,12 +2,14 @@ import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
 import { mockTweets, emotionData } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Smile, MessageSquare } from "lucide-react";
+import { Smile, MessageSquare, Tag } from "lucide-react";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from "recharts";
 import { useState } from "react";
+import { useProject } from "@/context/ProjectContext";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const emotionEmojis: Record<string, { emoji: string; color: string; bg: string }> = {
@@ -21,10 +23,24 @@ const emotionEmojis: Record<string, { emoji: string; color: string; bg: string }
 
 const EmotionAnalysis = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
+  const { selectedProject } = useProject();
 
   const filteredTweets = selectedEmotion
     ? mockTweets.filter((t) => t.emotion === selectedEmotion)
     : mockTweets;
+
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      sports: "Sports",
+      politics: "Politics",
+      business: "Business",
+      technology: "Technology",
+      entertainment: "Entertainment",
+      health: "Health",
+      education: "Education",
+    };
+    return labels[category] || category;
+  };
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
@@ -33,9 +49,20 @@ const EmotionAnalysis = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-foreground mb-2">Emotion Analysis</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold text-foreground">Emotion Analysis</h1>
+          {selectedProject && (
+            <Badge variant="secondary" className="text-sm">
+              <Tag className="w-3 h-3 mr-1" />
+              {getCategoryLabel(selectedProject.category)}
+            </Badge>
+          )}
+        </div>
         <p className="text-muted-foreground">
-          Analisis reaksi emosional audiens terhadap konteks yang dibicarakan
+          Analyze audience emotional reactions to the discussed context
+          {selectedProject && (
+            <span className="text-primary"> — {selectedProject.name}</span>
+          )}
         </p>
       </motion.div>
 
@@ -145,11 +172,11 @@ const EmotionAnalysis = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-primary" />
-            Tweets {selectedEmotion && `- ${selectedEmotion.charAt(0).toUpperCase() + selectedEmotion.slice(1)}`}
+            Tweets {selectedEmotion && `— ${selectedEmotion.charAt(0).toUpperCase() + selectedEmotion.slice(1)}`}
             {selectedEmotion && (
               <button
                 onClick={() => setSelectedEmotion(null)}
-                className="text-sm text-primary hover:underline ml-auto"
+                className="text-sm text-primary hover:underline ml-auto font-normal"
               >
                 Clear filter
               </button>

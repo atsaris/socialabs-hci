@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, User, Lightbulb } from "lucide-react";
+import { Bot, Send, User, Lightbulb, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProject } from "@/context/ProjectContext";
+import { mockTopics } from "@/data/mockData";
 
 interface Message {
   id: string;
@@ -13,26 +15,36 @@ interface Message {
   timestamp: Date;
 }
 
-const suggestedQuestions = [
-  "Apa topik yang paling banyak dibicarakan?",
-  "Bagaimana sentimen audiens terhadap teknologi AI?",
-  "Siapa influencer paling berpengaruh dalam topik ini?",
-  "Berapa persentase tweet dengan emosi positif?",
-  "Jelaskan komunitas yang terbentuk dalam data ini",
-];
-
 const Chatbot = () => {
+  const { selectedProject } = useProject();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
-      content: "Halo! 👋 Saya adalah AI assistant yang siap membantu Anda memahami hasil analisis media sosial. Silakan ajukan pertanyaan tentang topik, sentimen, emosi, influencer, atau komunitas yang terdeteksi.",
+      content: `Halo! 👋 Saya adalah AI assistant Socialabs yang siap membantu Anda memahami hasil analisis${selectedProject ? ` untuk project "${selectedProject.name}"` : ''}. Silakan ajukan pertanyaan tentang topik, sentimen, emosi, influencer, atau komunitas yang terdeteksi.`,
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Project-based suggested questions
+  const projectQuestions = selectedProject ? [
+    `Apa topik yang paling banyak dibicarakan tentang ${selectedProject.keywords[0]}?`,
+    `Bagaimana sentimen publik terhadap ${selectedProject.keywords[0]}?`,
+    `Siapa influencer yang paling berpengaruh di topik ${selectedProject.keywords[0]}?`,
+    `Berapa persentase sentimen positif tentang ${selectedProject.name}?`,
+  ] : [
+    "Tolong pilih project terlebih dahulu untuk melihat analisis",
+  ];
+
+  // Topic-based suggested questions
+  const topicQuestions = mockTopics.slice(0, 2).map(topic => 
+    `Jelaskan lebih detail tentang topik "${topic.name}"`
+  );
+
+  const allSuggestedQuestions = [...projectQuestions, ...topicQuestions];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -59,27 +71,34 @@ const Chatbot = () => {
     // Simulate AI response
     setTimeout(() => {
       const responses: Record<string, string> = {
-        "topik": "📊 Berdasarkan analisis, topik yang paling banyak dibicarakan adalah **Teknologi AI** dengan 28% dari total tweets, diikuti oleh **Ekonomi Digital** (22%) dan **Kebijakan Pemerintah** (18%). Topik AI mendominasi karena banyak diskusi tentang perkembangan teknologi dan dampaknya terhadap industri.",
-        "sentimen": "💭 Analisis sentimen menunjukkan bahwa 45% tweets bersifat **positif**, 30% **netral**, dan 25% **negatif**. Sentimen positif didominasi oleh excitement terhadap inovasi teknologi, sementara sentimen negatif lebih banyak terkait kekhawatiran dampak AI terhadap pekerjaan.",
-        "influencer": "👤 Influencer paling berpengaruh adalah **@influencer_tech** dengan influence score 95/100 dan 2.5M followers. Engagement rate-nya mencapai 4.5%, jauh di atas rata-rata. Tweet-nya tentang teknologi AI sering menjadi viral dan banyak di-retweet.",
-        "emosi": "😊 Distribusi emosi menunjukkan **Joy** mendominasi dengan 35%, diikuti **Surprise** (18%), **Anger** (15%), dan emosi lainnya. Emosi positif lebih banyak muncul pada diskusi tentang inovasi, sementara anger lebih banyak pada topik kebijakan.",
-        "komunitas": "🌐 Terdeteksi 5 komunitas utama: **Tech Enthusiasts** (12.5K members), **Business Leaders** (8.9K), **Policy Watchers** (6.7K), **Education Advocates** (5.4K), dan **Health Professionals** (4.2K). Setiap komunitas memiliki topik diskusi yang berbeda-beda.",
+        "topik": `📊 Berdasarkan analisis project "${selectedProject?.name || 'yang dipilih'}", topik yang paling banyak dibicarakan adalah **${mockTopics[0].name}** dengan ${mockTopics[0].percentage}% dari total tweets. Topik ini mencakup diskusi tentang ${mockTopics[0].keywords.join(", ")}. Topik kedua terbanyak adalah **${mockTopics[1].name}** dengan ${mockTopics[1].percentage}%.`,
+        "sentimen": `💭 Analisis sentimen untuk kata kunci "${selectedProject?.keywords[0] || 'yang dipilih'}" menunjukkan bahwa **64% tweets bersifat positif** dan **36% bersifat negatif**. Sentimen positif didominasi oleh antusiasme dan dukungan, sementara sentimen negatif lebih banyak terkait kekhawatiran dan kritik.`,
+        "influencer": `👤 Influencer paling berpengaruh dalam topik ini adalah **@bobotoh_official** dengan influence score 95/100 dan 2.5M followers. Engagement rate-nya mencapai 4.5%, jauh di atas rata-rata. Influencer lainnya termasuk @persib_update dan @viking_persib.`,
+        "emosi": `😊 Distribusi emosi menunjukkan **Joy** mendominasi dengan 35%, diikuti **Surprise** (18%), **Anger** (15%), dan emosi lainnya. Emosi positif lebih banyak muncul pada diskusi tentang performa, sementara anger lebih banyak pada topik kritik.`,
+        "komunitas": `🌐 Terdeteksi ${mockTopics.length} komunitas utama: **Bobotoh Core** (15.2K members), **Analis Taktik** (8.9K), **Supporter Kritis** (6.7K), dan **Media Olahraga** (5.4K). Setiap komunitas memiliki topik diskusi dan karakteristik yang berbeda.`,
+        "transfer": `⚽ Diskusi tentang **Transfer Pemain** mendominasi dengan 41% dari total tweets. Fans sangat antusias dengan kedatangan pemain baru dan banyak yang membahas pengalaman serta kualitas pemain dari klub sebelumnya.`,
+        "positif": `✅ Dari analisis, **64% konten bersifat positif**. Kata-kata yang paling sering muncul dalam sentimen positif adalah: "keren", "mantap", "hebat", "bagus", dan "berkelas". Ini menunjukkan antusiasme tinggi dari audiens.`,
       };
 
-      let response = "Terima kasih atas pertanyaannya! ";
+      let response = `Terima kasih atas pertanyaannya tentang project "${selectedProject?.name || ''}"! `;
       
-      if (input.toLowerCase().includes("topik")) {
+      const inputLower = input.toLowerCase();
+      if (inputLower.includes("topik")) {
         response = responses["topik"];
-      } else if (input.toLowerCase().includes("sentimen")) {
+      } else if (inputLower.includes("sentimen")) {
         response = responses["sentimen"];
-      } else if (input.toLowerCase().includes("influencer")) {
+      } else if (inputLower.includes("influencer")) {
         response = responses["influencer"];
-      } else if (input.toLowerCase().includes("emosi") || input.toLowerCase().includes("positif")) {
+      } else if (inputLower.includes("emosi")) {
         response = responses["emosi"];
-      } else if (input.toLowerCase().includes("komunitas")) {
+      } else if (inputLower.includes("komunitas")) {
         response = responses["komunitas"];
+      } else if (inputLower.includes("transfer")) {
+        response = responses["transfer"];
+      } else if (inputLower.includes("positif") || inputLower.includes("persentase")) {
+        response = responses["positif"];
       } else {
-        response = "Berdasarkan data yang tersedia, saya dapat membantu Anda menganalisis:\n\n• **Topik** - 6 topik utama teridentifikasi\n• **Sentimen** - 45% positif, 30% netral, 25% negatif\n• **Emosi** - Joy mendominasi dengan 35%\n• **Influencer** - 156 influencer teridentifikasi\n• **Komunitas** - 5 komunitas utama\n\nSilakan tanyakan lebih spesifik tentang aspek yang ingin Anda ketahui!";
+        response = `Berdasarkan data yang tersedia untuk project "${selectedProject?.name || 'yang dipilih'}", saya dapat membantu Anda menganalisis:\n\n• **Topik** - ${mockTopics.length} topik utama teridentifikasi\n• **Sentimen** - 64% positif, 36% negatif\n• **Emosi** - Joy mendominasi dengan 35%\n• **Influencer** - 4 influencer utama teridentifikasi\n• **Komunitas** - 4 komunitas utama\n\nSilakan tanyakan lebih spesifik tentang aspek yang ingin Anda ketahui!`;
       }
 
       const assistantMessage: Message = {
@@ -109,7 +128,10 @@ const Chatbot = () => {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2">AI Chatbot</h1>
           <p className="text-muted-foreground">
-            Tanyakan apapun tentang hasil analisis media sosial Anda
+            Ask anything about your social media analysis
+            {selectedProject && (
+              <span className="text-primary"> — {selectedProject.name}</span>
+            )}
           </p>
         </div>
 
@@ -121,7 +143,7 @@ const Chatbot = () => {
                 <Bot className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-sm font-medium">SocialX Assistant</p>
+                <p className="text-sm font-medium">Socialabs Assistant</p>
                 <p className="text-xs text-muted-foreground">AI-powered insights</p>
               </div>
               <div className="ml-auto flex items-center gap-2">
@@ -200,10 +222,10 @@ const Chatbot = () => {
             <div className="px-4 pb-2">
               <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
                 <Lightbulb className="w-3 h-3" />
-                <span>Pertanyaan yang disarankan:</span>
+                <span>Suggested questions:</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {suggestedQuestions.map((question, index) => (
+                {allSuggestedQuestions.slice(0, 5).map((question, index) => (
                   <Button
                     key={index}
                     variant="outline"
@@ -215,6 +237,27 @@ const Chatbot = () => {
                   </Button>
                 ))}
               </div>
+              {mockTopics.length > 0 && (
+                <>
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2 mt-3">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>Questions based on trending topics:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {topicQuestions.map((question, index) => (
+                      <Button
+                        key={`topic-${index}`}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSuggestedQuestion(question)}
+                        className="text-xs h-auto py-1.5"
+                      >
+                        {question}
+                      </Button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
 

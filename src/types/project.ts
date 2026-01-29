@@ -24,7 +24,7 @@ export interface Tweet {
   likes: number;
   retweets: number;
   replies: number;
-  sentiment: 'positive' | 'negative' | 'neutral';
+  sentiment: 'positive' | 'negative';
   emotion: 'joy' | 'anger' | 'sadness' | 'fear' | 'surprise' | 'disgust';
   topic: string;
   createdAt: Date;
@@ -34,6 +34,7 @@ export interface Topic {
   id: string;
   name: string;
   keywords: string[];
+  description?: string;
   tweetsCount: number;
   percentage: number;
 }

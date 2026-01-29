@@ -4,9 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
+import { ProjectProvider } from "./context/ProjectContext";
 import Dashboard from "./pages/Dashboard";
+import Projects from "./pages/Projects";
 import CreateProject from "./pages/CreateProject";
-import TopicModeling from "./pages/TopicModeling";
+import TrendingTopics from "./pages/TrendingTopics";
 import SentimentAnalysis from "./pages/SentimentAnalysis";
 import EmotionAnalysis from "./pages/EmotionAnalysis";
 import InfluencerRecommendation from "./pages/InfluencerRecommendation";
@@ -18,25 +20,28 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/create-project" element={<CreateProject />} />
-            <Route path="/topics" element={<TopicModeling />} />
-            <Route path="/sentiment" element={<SentimentAnalysis />} />
-            <Route path="/emotion" element={<EmotionAnalysis />} />
-            <Route path="/influencer" element={<InfluencerRecommendation />} />
-            <Route path="/community" element={<CommunityDetection />} />
-            <Route path="/chatbot" element={<Chatbot />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ProjectProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/create-project" element={<CreateProject />} />
+              <Route path="/trending-topics" element={<TrendingTopics />} />
+              <Route path="/sentiment" element={<SentimentAnalysis />} />
+              <Route path="/emotion" element={<EmotionAnalysis />} />
+              <Route path="/influencer" element={<InfluencerRecommendation />} />
+              <Route path="/community" element={<CommunityDetection />} />
+              <Route path="/chatbot" element={<Chatbot />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ProjectProvider>
   </QueryClientProvider>
 );
 
