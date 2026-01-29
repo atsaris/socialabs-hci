@@ -88,29 +88,21 @@ const Dashboard = () => {
         <StatCard
           title="Total Tweets"
           value="170K"
-          change="+12.5%"
-          changeType="positive"
           icon={MessageSquare}
         />
         <StatCard
           title="Total Projects"
           value={projects.length}
-          change="2 active"
-          changeType="neutral"
           icon={FolderOpen}
         />
         <StatCard
           title="Influencers Found"
           value="156"
-          change="+8"
-          changeType="positive"
           icon={Users}
         />
         <StatCard
           title="Topics Detected"
           value="24"
-          change="+5"
-          changeType="positive"
           icon={Hash}
         />
       </div>
@@ -251,15 +243,6 @@ const Dashboard = () => {
                       <h4 className="font-medium text-foreground">
                         {project.name}
                       </h4>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        project.status === 'active' 
-                          ? 'bg-success/10 text-success' 
-                          : project.status === 'completed'
-                          ? 'bg-muted-foreground/10 text-muted-foreground'
-                          : 'bg-warning/10 text-warning'
-                      }`}>
-                        {project.status}
-                      </span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
                       {project.description}

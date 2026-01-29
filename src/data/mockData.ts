@@ -219,10 +219,10 @@ export const mockInfluencers: Influencer[] = [
 ];
 
 export const mockCommunities: Community[] = [
-  { id: "1", name: "Bobotoh Core", members: 15200, mainTopic: "Transfer Pemain", color: "#1DA1F2" },
-  { id: "2", name: "Analis Taktik", members: 8900, mainTopic: "Performa Pemain", color: "#17BF63" },
-  { id: "3", name: "Supporter Kritis", members: 6700, mainTopic: "Finansial Klub", color: "#FFAD1F" },
-  { id: "4", name: "Media Olahraga", members: 5400, mainTopic: "Transfer Pemain", color: "#794BC4" },
+  { id: "1", name: "Community of @bobotoh_official", members: 15200, mainTopic: "Transfer Pemain", color: "#1DA1F2" },
+  { id: "2", name: "Community of @persib_update", members: 8900, mainTopic: "Performa Pemain", color: "#17BF63" },
+  { id: "3", name: "Community of @viking_persib", members: 6700, mainTopic: "Finansial Klub", color: "#FFAD1F" },
+  { id: "4", name: "Community of @liga1_news", members: 5400, mainTopic: "Transfer Pemain", color: "#794BC4" },
 ];
 
 // Sentiment data (only positive and negative)
