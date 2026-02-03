@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
 import { mockTweets, emotionData } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Smile, MessageSquare, Tag } from "lucide-react";
+import { Smile, MessageSquare, Tag, Users } from "lucide-react"; // Tambah import Users
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
@@ -68,7 +68,27 @@ const EmotionAnalysis = () => {
         </p>
       </motion.div>
 
-      {/* Emotion Cards */}
+      {/* Stats Section: Total Tweets Card */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          // whileHover={{ scale: 1.02 }}
+          className="rounded-2xl p-6 bg-card border border-border/50 transition-all shadow-sm"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Users className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Tweets</p>
+              <p className="text-3xl font-bold text-foreground">45,000</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Emotion Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {emotionData.map((emotion, index) => (
           <motion.div
@@ -131,9 +151,7 @@ const EmotionAnalysis = () => {
                       borderRadius: "8px",
                       color: "#fff"
                     }}
-                    itemStyle={{ 
-                    color: "#fff" // <-- TAMBAHKAN INI (Biar teks list item/data jadi putih)
-                    }}
+                    itemStyle={{ color: "#fff" }}
                   />
                   <Legend />
                 </PieChart>
@@ -161,9 +179,7 @@ const EmotionAnalysis = () => {
                       borderRadius: "8px",
                       color: "#fff"
                     }}
-                    itemStyle={{ 
-                    color: "#fff" // <-- TAMBAHKAN INI (Biar teks list item/data jadi putih)
-                    }}
+                    itemStyle={{ color: "#fff" }}
                   />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     {emotionData.map((entry, index) => (

@@ -84,7 +84,7 @@ export function InfluencerCard({ influencer, rank, className }: InfluencerCardPr
         </div>
       </div>
 
-      {/* Influence meter */}
+      {/* Influence meter
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm text-muted-foreground">Influence Score</span>
@@ -98,12 +98,19 @@ export function InfluencerCard({ influencer, rank, className }: InfluencerCardPr
             className="h-full gradient-primary rounded-full"
           />
         </div>
-      </div>
+      </div> */}
 
-      <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-        <ExternalLink className="w-4 h-4 mr-2" />
-        View Profile
-      </Button>
+<a 
+  href={`https://x.com/${influencer.username.replace('@', '')}`} 
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="block w-full"
+>
+  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+    <ExternalLink className="w-4 h-4 mr-2" />
+    View Profile
+  </Button>
+</a>
     </motion.div>
   );
 }

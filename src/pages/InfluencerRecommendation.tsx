@@ -28,18 +28,18 @@ const InfluencerRecommendation = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
           title="Total Influencers"
-          value="156"
+          value="10"
           icon={Users}
         />
         <StatCard
           title="Top Influencer"
-          value="@bobotoh_official"
+          value="@bandungfootball"
           icon={Crown}
         />
         <StatCard
           title="Avg Engagement"
           value="4.1%"
-          change="+0.5%"
+          change=""
           changeType="positive"
           icon={TrendingUp}
         />
@@ -57,10 +57,13 @@ const InfluencerRecommendation = () => {
             <Crown className="w-5 h-5 text-primary" />
             Top Influencers
           </CardTitle>
+          <p className="text-m text-muted-foreground">
+              Ranking is determined based on the volume of mentions and retweets within the network.
+            </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {mockInfluencers.map((influencer, index) => (
+            {mockInfluencers.slice(0,4).map((influencer, index) => (
               <InfluencerCard
                 key={influencer.id}
                 influencer={influencer}
@@ -106,10 +109,10 @@ const InfluencerRecommendation = () => {
                   <p className="font-medium text-foreground">{influencer.displayName}</p>
                   <p className="text-sm text-muted-foreground">@{influencer.username}</p>
                 </div>
-                <div className="text-right">
+                {/* <div className="text-right">
                   <div className="flex items-center gap-1">
-                    <p className="font-bold text-primary">{influencer.influence}/100</p>
-                    <Tooltip>
+                    <p className="font-bold text-primary">{influencer.influence}/100</p> */}
+                    {/* <Tooltip>
                       <TooltipTrigger>
                         <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors cursor-help" />
                       </TooltipTrigger>
@@ -121,17 +124,26 @@ const InfluencerRecommendation = () => {
                           influence within the analyzed context.
                         </p>
                       </TooltipContent>
-                    </Tooltip>
-                  </div>
+                    </Tooltip> */}
+                  {/* </div>
                   <p className="text-xs text-muted-foreground">Influence Score</p>
-                </div>
+                </div> */}
                 <div className="text-right hidden md:block">
-                  <p className="font-medium text-foreground">{(influencer.followers / 1000000).toFixed(1)}M</p>
-                  <p className="text-xs text-muted-foreground">Followers</p>
+                  <p className="font-medium text-foreground">
+                     {influencer.followers >= 1000000 
+                  ? `${(influencer.followers / 1000000).toFixed(1)}M` 
+                  : `${(influencer.followers / 1000).toFixed(0)}K`
+                   }
+                  </p>
+                 <p className="text-xs text-muted-foreground">Followers</p>
                 </div>
                 <div className="text-right hidden lg:block">
                   <p className="font-medium text-foreground">{influencer.engagement}%</p>
                   <p className="text-xs text-muted-foreground">Engagement</p>
+                </div>
+                <div className="text-right hidden lg:block">
+                  <p className="font-medium text-foreground">{influencer.tweetsCount}</p>
+                  <p className="text-xs text-muted-foreground">Tweets</p>
                 </div>
               </motion.div>
             ))}

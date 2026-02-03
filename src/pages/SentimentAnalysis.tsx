@@ -2,12 +2,33 @@ import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
 import { mockTweets, sentimentData, positiveWords, negativeWords } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ThumbsUp, ThumbsDown, MessageSquare, Tag } from "lucide-react";
+import { Heart, ThumbsUp, ThumbsDown, MessageSquare, Tag, Users } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { useState } from "react";
 import { useProject } from "@/context/ProjectContext";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+
+// Fungsi untuk merender label persentase statis di dalam Pie Chart
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="white" 
+      textAnchor="middle" 
+      dominantBaseline="central" 
+      className="text-xs font-bold"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 // Word Cloud Component
 const WordCloud = ({ 
@@ -46,7 +67,8 @@ const WordCloud = ({
               )}
               style={{
                 fontSize: `${size}rem`,
-                color: isHovered ? color : `${color}99`,
+                // UBAH DISINI: Warna langsung menggunakan 'color' asli tanpa opacity 99
+                color: color,
               }}
             >
               {word.text}
@@ -120,8 +142,27 @@ const SentimentAnalysis = () => {
         </p>
       </motion.div>
 
-      {/* Sentiment Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Stats Grid: Total Tweets (Kiri) + Sentiment Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card Total Tweets */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          // whileHover={{ scale: 1.02 }}
+          className="rounded-2xl p-6 bg-card border border-border/50 transition-all shadow-sm"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Users className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Tweets</p>
+              <p className="text-3xl font-bold text-foreground">45,000</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Sentiment Stats */}
         {sentimentStats.map((stat) => (
           <motion.div
             key={stat.label}
@@ -172,19 +213,25 @@ const SentimentAnalysis = () => {
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
-                    innerRadius={60}
-                    paddingAngle={2}
+                    innerRadius={0}
+                    paddingAngle={0}
+                    labelLine={false}
+                    label={renderCustomizedLabel}
                   >
                     {sentimentData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(222, 47%, 8%)",
-                      border: "1px solid hsl(222, 30%, 18%)",
-                      borderRadius: "8px",
-                    }}
+                  <Tooltip          
+                  separator="" // Menghilangkan tanda titik dua (:)
+                   formatter={(value: number) => [`${(value * 450).toLocaleString()} Tweets`, ""]} // Mengosongkan nama label
+                  contentStyle={{
+                   backgroundColor: "hsl(222, 47%, 8%)",
+                  border: "1px solid hsl(222, 30%, 18%)",
+                  borderRadius: "8px",
+                  color: "#fff"
+                   }}
+                  itemStyle={{ color: "#fff" }}
                   />
                   <Legend />
                 </PieChart>
