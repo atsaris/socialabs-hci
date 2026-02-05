@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
 import { mockTweets, emotionData } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Smile, MessageSquare, Tag, Users } from "lucide-react"; // Tambah import Users
+import { Smile, MessageSquare, Tag, Users } from "lucide-react";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
@@ -21,9 +21,36 @@ const emotionEmojis: Record<string, { emoji: string; color: string; bg: string }
   disgust: { emoji: "🤢", color: "text-orange-500", bg: "bg-orange-500/10" },
 };
 
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="white" 
+      textAnchor="middle" 
+      dominantBaseline="central" 
+      className="text-xs font-bold"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 const EmotionAnalysis = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const { selectedProject } = useProject();
+
+  const barChartData = emotionData
+    .map(item => ({
+      ...item,
+      tweetCount: (item.value * 45000) / 100
+    }))
+    .sort((a, b) => b.tweetCount - a.tweetCount);
 
   const filteredTweets = selectedEmotion
     ? mockTweets.filter((t) => t.emotion === selectedEmotion)
@@ -68,12 +95,11 @@ const EmotionAnalysis = () => {
         </p>
       </motion.div>
 
-      {/* Stats Section: Total Tweets Card */}
+      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          // whileHover={{ scale: 1.02 }}
           className="rounded-2xl p-6 bg-card border border-border/50 transition-all shadow-sm"
         >
           <div className="flex items-center gap-4">
@@ -139,12 +165,18 @@ const EmotionAnalysis = () => {
                     outerRadius={100}
                     innerRadius={0}
                     paddingAngle={0}
+                    labelLine={false}
+                    label={renderCustomizedLabel}
                   >
                     {emotionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
+                    formatter={(value: number, name: string) => [
+                      `${value}%`, 
+                      name
+                    ]}
                     contentStyle={{
                       backgroundColor: "hsl(222, 47%, 8%)",
                       border: "1px solid hsl(222, 30%, 18%)",
@@ -168,11 +200,22 @@ const EmotionAnalysis = () => {
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={emotionData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" />
-                  <XAxis type="number" stroke="hsl(220, 10%, 60%)" fontSize={12} />
+                <BarChart data={barChartData} layout="vertical" margin={{ left: 0, right: 30, top: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" horizontal={true} vertical={false} />
+                  <XAxis 
+                    type="number" 
+                    domain={[0, 45000]}
+                    stroke="hsl(220, 10%, 60%)" 
+                    fontSize={12} 
+                    tickFormatter={(value) => value.toLocaleString()}
+                  />
                   <YAxis dataKey="name" type="category" stroke="hsl(220, 10%, 60%)" fontSize={12} width={80} />
                   <Tooltip
+                    separator=""
+                    formatter={(value: number) => [
+                      `${value.toLocaleString()} Tweets`, 
+                      ""
+                    ]}
                     contentStyle={{
                       backgroundColor: "hsl(222, 47%, 8%)",
                       border: "1px solid hsl(222, 30%, 18%)",
@@ -181,8 +224,8 @@ const EmotionAnalysis = () => {
                     }}
                     itemStyle={{ color: "#fff" }}
                   />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                    {emotionData.map((entry, index) => (
+                  <Bar dataKey="tweetCount" radius={[0, 4, 4, 0]}>
+                    {barChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Bar>

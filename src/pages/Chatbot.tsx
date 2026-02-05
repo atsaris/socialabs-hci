@@ -146,10 +146,10 @@ const Chatbot = () => {
                 <p className="text-sm font-medium">Socialabs Assistant</p>
                 <p className="text-xs text-muted-foreground">AI-powered insights</p>
               </div>
-              <div className="ml-auto flex items-center gap-2">
+              {/* <div className="ml-auto flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
                 <span className="text-xs text-muted-foreground">Online</span>
-              </div>
+              </div> */}
             </CardTitle>
           </CardHeader>
 

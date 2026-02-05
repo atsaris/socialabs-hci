@@ -62,7 +62,7 @@ const WordCloud = ({
           >
             <span
               className={cn(
-                "cursor-pointer transition-all duration-200 font-medium",
+                "cursor-default transition-all duration-200 font-medium",
                 isHovered && "underline"
               )}
               style={{

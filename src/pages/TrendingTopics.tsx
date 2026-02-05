@@ -121,7 +121,7 @@ const TrendingTopics = () => {
                 <TableHead className="w-[200px]">Topic</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead className="text-right w-[100px]">Tweets</TableHead>
-                <TableHead className="text-right w-[100px]">Percentage</TableHead>
+                {/* Kolom Percentage dihapus dari sini */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -154,9 +154,7 @@ const TrendingTopics = () => {
                   <TableCell className="text-right font-medium">
                     {topic.tweetsCount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <span className="font-bold text-primary">{topic.percentage}%</span>
-                  </TableCell>
+                  {/* TableCell untuk percentage dihapus dari sini */}
                 </TableRow>
               ))}
             </TableBody>

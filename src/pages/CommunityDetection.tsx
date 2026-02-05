@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import ForceGraph2D from "react-force-graph-2d";
 import { mockCommunities, mockInfluencers, mockTopics, mockTweets } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Network, Users, MessageSquare, User, Tag, ChevronRight, Info } from "lucide-react";
+import { Network, Users, MessageSquare, User, Tag, LayoutGrid, Info } from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { TweetCard } from "@/components/ui/tweet-card";
@@ -33,15 +33,15 @@ const CommunityDetection = () => {
     const nodes: any[] = [];
     const links: any[] = [];
 
+    const targetIds = ["1", "2", "3", "4"];
+    const filteredInfluencers = mockInfluencers.filter(inf => targetIds.includes(inf.id));
+
     const randomUsernames = [
       "adi_saputra", "budi_santoso", "citra_lestari", "dimas_pratama", "eka_susanti",
       "fajar_nugraha", "gita_pertiwi", "hendra_wijaya", "indah_cahya", "joko_prasetyo",
       "kartika_dewi", "lukman_hakim", "maya_sari", "novi_andriani", "oscar_mahendra",
       "putri_rahmadani", "rizky_fauzi", "siti_aminah", "teguh_wibowo", "usman_afandi",
-      "vina_amelia", "wahyu_hidayat", "yusuf_pratama", "zainal_arifin", "asep_saepudin",
-      "dadang_suhendar", "ujang_solihin", "deden_kurniawan", "cecep_mulyana", "elis_nurlaila",
-      "neng_sri99", "kang_maman", "teh_rini", "mang_oleh", "bi_ijah", "gilang_ramadhan",
-      "hani_handayani", "indra_kusuma", "jessica_mila", "kiki_fatmala"
+      "vina_amelia", "wahyu_hidayat", "yusuf_pratama", "zainal_arifin"
     ];
 
     const getRandomUsername = (index: number) => {
@@ -50,7 +50,7 @@ const CommunityDetection = () => {
       return Math.random() > 0.5 ? `@${baseName}${randomSuffix}` : `@${baseName}`;
     };
 
-    mockInfluencers.forEach((inf, i) => {
+    filteredInfluencers.forEach((inf, i) => {
       const community = mockCommunities[i % mockCommunities.length];
       if (!community) return;
 
@@ -61,25 +61,28 @@ const CommunityDetection = () => {
         color: community.color,
         isInfluencer: true,
         communityId: community.id,
+        // Tambahkan profil URL di sini (mengasumsikan username diawali @ atau string murni)
+        profileUrl: `https://x.com/${inf.username.replace('@', '')}`
       });
 
-      mockInfluencers.forEach((otherInf) => {
+      filteredInfluencers.forEach((otherInf) => {
         if (inf.id !== otherInf.id) {
           links.push({
             source: inf.id,
             target: otherInf.id,
-            color: "#ffffff20", // Ditingkatkan sedikit agar lebih kelihatan
+            color: "#ffffff20",
             width: 1,
-            distance: 250, // Dirapatkan sedikit antar influencer
+            distance: 250,
           });
         }
       });
     });
 
     let userGlobalIndex = 0;
-    mockCommunities.forEach((community) => {
-      const influencer = nodes.find(n => n.communityId === community.id && n.isInfluencer);
-      if (!influencer) return;
+    filteredInfluencers.forEach((inf, index) => {
+      const community = mockCommunities[index % mockCommunities.length];
+      const influencerNode = nodes.find(n => n.id === inf.id);
+      if (!influencerNode) return;
 
       const numUsers = 15;
       const communityUsers: any[] = [];
@@ -103,28 +106,19 @@ const CommunityDetection = () => {
 
         links.push({
           source: userId,
-          target: influencer.id,
+          target: influencerNode.id,
           color: community.color, 
-          width: 0.8, // Garis lebih tebal
-          distance: 40, // Jarak ke influencer lebih rapat (sebelumnya 70)
+          width: 0.8,
+          distance: 40,
         });
 
         if (i > 0) {
           links.push({
             source: userId,
             target: communityUsers[i - 1].id,
-            color: `${community.color}70`, // Opacity ditingkatkan agar garis mesh terlihat
+            color: `${community.color}70`,
             width: 0.4,
-            distance: 30, // Jarak antar user lebih rapat (sebelumnya 50)
-          });
-        }
-        if (i > 2) {
-          links.push({
-            source: userId,
-            target: communityUsers[Math.floor(Math.random() * (i - 1))].id,
-            color: `${community.color}50`, // Opacity ditingkatkan
-            width: 0.3,
-            distance: 35, // Jarak acak lebih rapat (sebelumnya 60)
+            distance: 30,
           });
         }
       }
@@ -164,19 +158,24 @@ const CommunityDetection = () => {
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard title="Communities" value={mockCommunities.length} icon={Network} />
+        <StatCard title="Communities" value={4} icon={LayoutGrid} />
         <StatCard title="Total Nodes" value={graphData.nodes.length} icon={Users} />
         <StatCard title="Connections" value={graphData.links.length} icon={Network} />
-        <StatCard title="Influencers" value={mockInfluencers.length} icon={User} />
+        <StatCard title="Influencers" value={4} icon={User} />
       </div>
 
       <Card className="bg-card border-border/50 overflow-hidden shadow-sm">
         <CardHeader className="border-b border-border/50 pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Network className="w-5 h-5 text-primary" />
-              Social Network Graph
-            </CardTitle>
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Network className="w-5 h-5 text-primary" />
+                Social Network Graph
+              </CardTitle>
+              <p className="text-sm text-muted-foreground font-normal">
+                Explore the connections between influencers and their communities to see who is driving the conversation.
+              </p>
+            </div>
             <div className="flex gap-2">
                {selectedCommunity && (
                 <Badge 
@@ -202,7 +201,7 @@ const CommunityDetection = () => {
           <div className="absolute top-4 left-4 z-10 bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl">
             <p className="text-xs font-bold text-slate-300 mb-2 uppercase">Communities</p>
             <div className="space-y-1">
-              {mockCommunities.map((c) => (
+              {mockCommunities.slice(0, 4).map((c) => (
                 <div 
                   key={c.id} 
                   className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer transition-colors ${selectedCommunity === c.id ? 'bg-white/10' : 'hover:bg-white/5'}`}
@@ -256,12 +255,21 @@ const CommunityDetection = () => {
               }
               ctx.globalAlpha = 1;
             }}
-            onNodeClick={(node) => {
-              setSelectedCommunity((node as any).communityId);
+            onNodeClick={(node: any) => {
+              // Jika yang diklik adalah influencer
+              if (node.isInfluencer) {
+                // Jika komunitas ini sudah terpilih (klik kedua kali), buka profil X
+                if (selectedCommunity === node.communityId) {
+                  window.open(node.profileUrl, '_blank');
+                  return;
+                }
+              }
+
+              // Aksi standar: Filter komunitas dan Zoom
+              setSelectedCommunity(node.communityId);
               graphRef.current?.centerAt(node.x, node.y, 1000);
               graphRef.current?.zoom(2, 1000);
             }}
-            // linkColor ditingkatkan agar garis tetap tajam meskipun difilter
             linkColor={(link: any) => selectedCommunity && link.source.communityId !== selectedCommunity ? '#ffffff05' : link.color}
             linkWidth={(link: any) => (link.source as any).isInfluencer && (link.target as any).isInfluencer ? 1.5 : 1}
           />
@@ -280,7 +288,7 @@ const CommunityDetection = () => {
             {activeTopics.slice(0, 4).map((topic, i) => (
               <div key={topic.id} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="font-medium text-foreground">#{topic.name}</span>
+                  <span className="font-medium text-foreground">{topic.name}</span>
                   <span className="text-muted-foreground">{topic.tweetsCount.toLocaleString()} tweets</span>
                 </div>
                 <div className="h-2 bg-secondary rounded-full overflow-hidden">
@@ -293,9 +301,6 @@ const CommunityDetection = () => {
                 </div>
               </div>
             ))}
-            <button className="w-full mt-4 text-sm text-primary flex items-center justify-center hover:underline">
-              View All Topics <ChevronRight className="w-4 h-4 ml-1" />
-            </button>
           </CardContent>
         </Card>
 

@@ -45,7 +45,7 @@ const InfluencerRecommendation = () => {
         />
         <StatCard
           title="Total Reach"
-          value="8.4M"
+          value="8,125"
           icon={Award}
         />
       </div>

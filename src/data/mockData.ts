@@ -141,7 +141,7 @@ export const mockTopics: Topic[] = [
     id: "1", 
     name: "Transfer Pemain", 
     keywords: ["kurzawa", "transfer", "pemain baru", "PSG"],
-    description: "Diskusi tentang kedatangan Layvin Kurzawa sebagai pemain baru Persib Bandung dari Paris Saint-Germain",
+    description: "Topik ini membahas tentang kedatangan Layvin Kurzawa sebagai pemain baru Persib Bandung dari Paris Saint-Germain",
     tweetsCount: 18500, 
     percentage: 41 
   },
@@ -149,7 +149,7 @@ export const mockTopics: Topic[] = [
     id: "2", 
     name: "Performa Pemain", 
     keywords: ["main", "performa", "skill", "crossing"],
-    description: "Analisis performa dan kemampuan teknis Kurzawa di lapangan saat membela Persib",
+    description: "Topik ini membahas analisis performa dan kemampuan teknis Kurzawa di lapangan saat membela Persib",
     tweetsCount: 12000, 
     percentage: 27 
   },
@@ -157,7 +157,7 @@ export const mockTopics: Topic[] = [
     id: "3", 
     name: "Finansial Klub", 
     keywords: ["gaji", "kontrak", "biaya", "mahal"],
-    description: "Pembahasan terkait aspek finansial dan nilai kontrak pemain untuk Persib Bandung",
+    description: "Topik ini membahas tentang aspek finansial dan nilai kontrak pemain untuk Persib Bandung",
     tweetsCount: 8500, 
     percentage: 19 
   },
@@ -165,7 +165,7 @@ export const mockTopics: Topic[] = [
     id: "4", 
     name: "Cedera Pemain", 
     keywords: ["cedera", "absen", "recovery", "medis"],
-    description: "Kekhawatiran fans tentang riwayat cedera dan kondisi fisik Kurzawa",
+    description: "Topik ini membahas tentang kekhawatiran fans tentang riwayat cedera dan kondisi fisik Kurzawa",
     tweetsCount: 6000, 
     percentage: 13 
   },
@@ -285,10 +285,10 @@ export const mockInfluencers: Influencer[] = [
 ];
 
 export const mockCommunities: Community[] = [
-  { id: "1", name: "Community of @bobotoh_official", members: 15200, mainTopic: "Transfer Pemain", color: "#1DA1F2" },
-  { id: "2", name: "Community of @persib_update", members: 8900, mainTopic: "Performa Pemain", color: "#17BF63" },
-  { id: "3", name: "Community of @viking_persib", members: 6700, mainTopic: "Finansial Klub", color: "#FFAD1F" },
-  { id: "4", name: "Community of @liga1_news", members: 5400, mainTopic: "Transfer Pemain", color: "#794BC4" },
+  { id: "1", name: "Community of @bandung_football", members: 15200, mainTopic: "Transfer Pemain", color: "#1DA1F2" },
+  { id: "2", name: "Community of @fabrizioromano", members: 8900, mainTopic: "Performa Pemain", color: "#17BF63" },
+  { id: "3", name: "Community of @faktasepakbola", members: 6700, mainTopic: "Finansial Klub", color: "#FFAD1F" },
+  { id: "4", name: "Community of @wallpassjournal", members: 5400, mainTopic: "Transfer Pemain", color: "#794BC4" },
 ];
 
 // Sentiment data (only positive and negative)
