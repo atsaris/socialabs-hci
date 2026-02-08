@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useProject } from "@/context/ProjectContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Import Input untuk search
+import { Input } from "@/components/ui/input"; 
 import { 
   Table, 
   TableBody, 
@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FolderOpen, Trash2, Plus, CheckCircle2, Search } from "lucide-react"; // Tambah icon Search
+import { FolderOpen, Trash2, Plus, CheckCircle2, Search } from "lucide-react"; 
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -40,10 +40,9 @@ const ITEMS_PER_PAGE = 5;
 const Projects = () => {
   const { projects, selectedProject, setSelectedProject, deleteProject } = useProject();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(""); // State pencarian
+  const [searchQuery, setSearchQuery] = useState(""); 
   const navigate = useNavigate();
 
-  // Filter pencarian berdasarkan nama, deskripsi, atau keyword
   const filteredProjects = projects.filter((project) => 
     project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -89,7 +88,6 @@ const Projects = () => {
             All Projects ({filteredProjects.length})
           </CardTitle>
 
-          {/* Search Field ditambahkan di sini */}
           <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -97,7 +95,7 @@ const Projects = () => {
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset ke hal 1 saat mengetik
+                setCurrentPage(1);
               }}
               className="pl-9 bg-muted/20 border-border/50"
             />
@@ -130,18 +128,21 @@ const Projects = () => {
                       <CheckCircle2 className="w-5 h-5 text-primary" />
                     )}
                   </TableCell>
-                  <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell className="text-muted-foreground max-w-[200px] truncate">
+                  <TableCell className="font-medium whitespace-nowrap">{project.name}</TableCell>
+                  
+                  {/* UPDATE: Description tidak dipotong, min-width ditambah agar proporsional */}
+                  <TableCell className="text-muted-foreground min-w-[300px] leading-relaxed">
                     {project.description}
                   </TableCell>
+
                   <TableCell>
-                    <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm">
+                    <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm whitespace-nowrap">
                       {project.keywords[0]}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {project.language === "id" ? "🇮🇩 Indonesian" : 
-                     project.language === "en" ? "🇺🇸 English" : "🌐 All"}
+                  <TableCell className="whitespace-nowrap">
+                    {/* UPDATE: Mengubah "All" menjadi "English" agar konsisten */}
+                    {project.language === "id" ? "🇮🇩 Indonesian" : "🇺🇸 English"}
                   </TableCell>
                   <TableCell className="text-right">
                     <AlertDialog>
