@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ProjectProvider } from "./context/ProjectContext";
 import Dashboard from "./pages/Dashboard";
@@ -27,9 +27,14 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route element={<AppLayout />}>
-              <Route path="/" element={<Dashboard />} />
+              {/* Landing page sekarang langsung ke Projects */}
+              <Route path="/" element={<Navigate to="/projects" replace />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/create-project" element={<CreateProject />} />
+              
+              {/* Dashboard lama kita jadikan halaman Overview */}
+              <Route path="/overview" element={<Dashboard />} />
+              
               <Route path="/trending-topics" element={<TrendingTopics />} />
               <Route path="/sentiment" element={<SentimentAnalysis />} />
               <Route path="/emotion" element={<EmotionAnalysis />} />

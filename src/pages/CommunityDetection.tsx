@@ -159,7 +159,7 @@ const CommunityDetection = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard title="Communities" value={4} icon={LayoutGrid} />
-        <StatCard title="Total Nodes" value={graphData.nodes.length} icon={Users} />
+        <StatCard title="Total Members" value={graphData.nodes.length} icon={Users} />
         <StatCard title="Connections" value={graphData.links.length} icon={Network} />
         <StatCard title="Influencers" value={4} icon={User} />
       </div>

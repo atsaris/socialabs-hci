@@ -1,300 +1,204 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useProject } from "@/context/ProjectContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  MessageSquare, TrendingUp, Smile, 
+  Users, BarChart3, Tag, ArrowUpRight 
+} from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
 import { 
-  MessageSquare, 
-  Users, 
-  FolderOpen,
-  Hash,
-  ArrowRight,
-  Plus,
-  Trash2
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Link, useNavigate } from "react-router-dom";
-import { useProject } from "@/context/ProjectContext";
-import { cn } from "@/lib/utils";
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid 
+} from "recharts";
+import { sentimentData, mockTopics, emotionData } from "@/data/mockData";
+import { useNavigate } from "react-router-dom";
 
-const ITEMS_PER_PAGE = 5;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-xs font-bold">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 const Dashboard = () => {
-  const { projects, selectedProject, setSelectedProject, deleteProject } = useProject();
-  const [showAll, setShowAll] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const { selectedProject } = useProject();
   const navigate = useNavigate();
 
-  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
-  const displayedProjects = showAll 
-    ? projects.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
-    : projects.slice(0, 3);
+  const barChartData = emotionData
+    .map(item => ({
+      ...item,
+      tweetCount: (item.value * 45000) / 100
+    }))
+    .sort((a, b) => b.tweetCount - a.tweetCount);
 
-  const handleSelectProject = (project: typeof projects[0]) => {
-    setSelectedProject(project);
-    navigate("/trending-topics");
-  };
+  if (!selectedProject) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center space-y-4">
+        <BarChart3 className="w-20 h-20 text-muted-foreground opacity-20" />
+        <h2 className="text-2xl font-bold italic text-muted-foreground">No active project</h2>
+        <p className="text-muted-foreground max-w-sm">Select a project from the "Projects" page to start analyzing the data.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
-      >
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome! Here's an overview of your social media analysis.
-          </p>
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold text-foreground">Project Overview</h1>
+          <Badge variant="secondary" className="text-sm">
+            <Tag className="w-3 h-3 mr-1" />
+            Sports
+          </Badge>
         </div>
-        <Link to="/create-project">
-          <Button className="gradient-primary text-primary-foreground hover:opacity-90">
-            <Plus className="w-4 h-4 mr-2" />
-            New Project
-          </Button>
-        </Link>
+        <p className="text-muted-foreground">
+          Comprehensive summary and analysis overview of the 
+          <span className="text-primary font-medium mx-1">
+            {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+          </span> 
+          discussion context.
+        </p>
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Tweets"
-          value="170K"
-          icon={MessageSquare}
-        />
-        <StatCard
-          title="Total Projects"
-          value={projects.length}
-          icon={FolderOpen}
-        />
-        <StatCard
-          title="Influencers Found"
-          value="156"
-          icon={Users}
-        />
-        <StatCard
-          title="Topics Detected"
-          value="24"
-          icon={Hash}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard title="Total Tweets" value="45,000" icon={MessageSquare} />
+        <StatCard title="Overall Sentiment" value="Positive" icon={Smile} />
+        <StatCard title="Top Influencer" value="@bandungfootball" icon={Users} />
+        <StatCard title="Identified Topics" value={mockTopics.length} icon={TrendingUp} />
       </div>
 
-      {/* Recent Projects - Full Width */}
-      <Card className="bg-card border-border/50">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <FolderOpen className="w-5 h-5 text-primary" />
-              Recent Projects
-            </span>
-            <Button 
-              variant="link" 
-              className="text-primary p-0 h-auto"
-              onClick={() => setShowAll(!showAll)}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* 1. Sentiment Distribution */}
+        <Card className="bg-card border-border/50 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Smile className="w-4 h-4 text-primary" />
+              Sentiment Distribution
+            </CardTitle>
+            <button 
+              onClick={() => navigate("/sentiment")}
+              className="p-1 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-primary"
             >
-              {showAll ? "Show less" : "View all"}
-            </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {showAll ? (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Project</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Keyword</TableHead>
-                    <TableHead>Language</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {displayedProjects.map((project) => (
-                    <TableRow 
-                      key={project.id}
-                      className="cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => handleSelectProject(project)}
-                    >
-                      <TableCell className="font-medium">{project.name}</TableCell>
-                      <TableCell className="text-muted-foreground max-w-[200px] truncate">
-                        {project.description}
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm">
-                          {project.keywords[0]}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {project.language === "id" ? "🇮🇩 Indonesian" : 
-                         project.language === "en" ? "🇺🇸 English" : "🌐 All"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{project.name}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteProject(project.id);
-                                }}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-4">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                          className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
-                        />
-                      </PaginationItem>
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            onClick={() => setCurrentPage(page)}
-                            isActive={currentPage === page}
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                          className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="space-y-4">
-              {displayedProjects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  onClick={() => handleSelectProject(project)}
-                  className="p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors cursor-pointer group flex items-center justify-between"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-foreground">
-                        {project.name}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                      {project.description}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="px-2 py-0.5 bg-primary/10 text-primary rounded">
-                        {project.keywords[0]}
-                      </span>
-                      <span>{project.tweetsCount.toLocaleString()} tweets</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{project.name}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteProject(project.id);
-                            }}
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-                  </div>
-                </motion.div>
-              ))}
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sentimentData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                  >
+                    {sentimentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: number, name: string) => [`${value}%`, name]}
+                    contentStyle={{ backgroundColor: "hsl(222, 47%, 8%)", border: "1px solid hsl(222, 30%, 18%)", borderRadius: "8px", color: "#fff" }}
+                    itemStyle={{ color: "#fff" }}
+                  />
+                  <Legend verticalAlign="bottom" height={36}/>
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* 2. Emotion Comparison */}
+        <Card className="bg-card border-border/50 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-primary" />
+              Emotion Comparison
+            </CardTitle>
+            <button 
+              onClick={() => navigate("/emotion")}
+              className="p-1 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-primary"
+            >
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barChartData} layout="vertical" margin={{ left: 0, right: 30, top: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" horizontal={true} vertical={false} />
+                  <XAxis 
+                    type="number" 
+                    domain={[0, 45000]}
+                    stroke="hsl(220, 10%, 60%)" 
+                    fontSize={10} 
+                    tickFormatter={(value) => value.toLocaleString()}
+                  />
+                  <YAxis dataKey="name" type="category" stroke="hsl(220, 10%, 60%)" fontSize={10} width={70} />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                    separator=""
+                    formatter={(value: number) => [`${value.toLocaleString()} Tweets`, ""]}
+                    contentStyle={{ backgroundColor: "hsl(222, 47%, 8%)", border: "1px solid hsl(222, 30%, 18%)", borderRadius: "8px", color: "#fff" }}
+                    itemStyle={{ color: "#fff" }}
+                  />
+                  <Bar dataKey="tweetCount" radius={[0, 4, 4, 0]}>
+                    {barChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 3. Top Trending Topics - Tanpa Hashtag & Angka */}
+        <Card className="bg-card border-border/50 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              Top Trending Topics
+            </CardTitle>
+            <button 
+              onClick={() => navigate("/trending-topics")}
+              className="p-1 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-primary"
+            >
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {mockTopics.slice(0, 5).map((topic) => (
+              <div 
+                key={topic.id} 
+                className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/50 hover:border-primary/30 transition-all cursor-pointer" 
+                onClick={() => navigate("/trending-topics")}
+              >
+                {/* Menghilangkan '#' dan merapikan teks */}
+                <span className="font-semibold text-primary text-sm capitalize">
+                  {topic.name.replace('#', '')}
+                </span>
+                {/* Badge Angka sudah dihapus */}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   );
 };

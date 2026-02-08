@@ -47,7 +47,7 @@ const Projects = () => {
 
   const handleSelectProject = (project: typeof projects[0]) => {
     setSelectedProject(project);
-    navigate("/trending-topics");
+    navigate("/overview");
   };
 
   return (

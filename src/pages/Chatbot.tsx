@@ -29,7 +29,6 @@ const Chatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Project-based suggested questions
   const projectQuestions = selectedProject ? [
     `Apa topik yang paling banyak dibicarakan tentang ${selectedProject.keywords[0]}?`,
     `Bagaimana sentimen publik terhadap ${selectedProject.keywords[0]}?`,
@@ -39,7 +38,6 @@ const Chatbot = () => {
     "Tolong pilih project terlebih dahulu untuk melihat analisis",
   ];
 
-  // Topic-based suggested questions
   const topicQuestions = mockTopics.slice(0, 2).map(topic => 
     `Jelaskan lebih detail tentang topik "${topic.name}"`
   );
@@ -52,15 +50,16 @@ const Chatbot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (customInput?: string) => {
+    const textToSend = customInput || input;
+    if (!textToSend.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
+      content: textToSend,
       timestamp: new Date(),
     };
 
@@ -68,7 +67,6 @@ const Chatbot = () => {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       const responses: Record<string, string> = {
         "topik": `📊 Berdasarkan analisis project "${selectedProject?.name || 'yang dipilih'}", topik yang paling banyak dibicarakan adalah **${mockTopics[0].name}** dengan ${mockTopics[0].percentage}% dari total tweets. Topik ini mencakup diskusi tentang ${mockTopics[0].keywords.join(", ")}. Topik kedua terbanyak adalah **${mockTopics[1].name}** dengan ${mockTopics[1].percentage}%.`,
@@ -81,24 +79,17 @@ const Chatbot = () => {
       };
 
       let response = `Terima kasih atas pertanyaannya tentang project "${selectedProject?.name || ''}"! `;
+      const inputLower = textToSend.toLowerCase();
       
-      const inputLower = input.toLowerCase();
-      if (inputLower.includes("topik")) {
-        response = responses["topik"];
-      } else if (inputLower.includes("sentimen")) {
-        response = responses["sentimen"];
-      } else if (inputLower.includes("influencer")) {
-        response = responses["influencer"];
-      } else if (inputLower.includes("emosi")) {
-        response = responses["emosi"];
-      } else if (inputLower.includes("komunitas")) {
-        response = responses["komunitas"];
-      } else if (inputLower.includes("transfer")) {
-        response = responses["transfer"];
-      } else if (inputLower.includes("positif") || inputLower.includes("persentase")) {
-        response = responses["positif"];
-      } else {
-        response = `Berdasarkan data yang tersedia untuk project "${selectedProject?.name || 'yang dipilih'}", saya dapat membantu Anda menganalisis:\n\n• **Topik** - ${mockTopics.length} topik utama teridentifikasi\n• **Sentimen** - 64% positif, 36% negatif\n• **Emosi** - Joy mendominasi dengan 35%\n• **Influencer** - 4 influencer utama teridentifikasi\n• **Komunitas** - 4 komunitas utama\n\nSilakan tanyakan lebih spesifik tentang aspek yang ingin Anda ketahui!`;
+      if (inputLower.includes("topik")) response = responses["topik"];
+      else if (inputLower.includes("sentimen")) response = responses["sentimen"];
+      else if (inputLower.includes("influencer")) response = responses["influencer"];
+      else if (inputLower.includes("emosi")) response = responses["emosi"];
+      else if (inputLower.includes("komunitas")) response = responses["komunitas"];
+      else if (inputLower.includes("transfer")) response = responses["transfer"];
+      else if (inputLower.includes("positif") || inputLower.includes("persentase")) response = responses["positif"];
+      else {
+        response = `Berdasarkan data yang tersedia untuk project "${selectedProject?.name || 'yang dipilih'}", saya dapat membantu Anda menganalisis:\n\n• **Topik** - ${mockTopics.length} topik utama teridentifikasi\n• **Sentimen** - 64% positif, 36% negatif\n• **Emosi** - Joy mendominasi dengan 35%\n\nSilakan tanyakan lebih spesifik!`;
       }
 
       const assistantMessage: Message = {
@@ -113,25 +104,15 @@ const Chatbot = () => {
     }, 1500);
   };
 
-  const handleSuggestedQuestion = (question: string) => {
-    setInput(question);
-  };
-
   return (
     <div className="p-6 lg:p-8 h-[calc(100vh-2rem)]">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="h-full flex flex-col"
-      >
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2">AI Chatbot</h1>
           <p className="text-muted-foreground">
             Ask anything about your social media analysis
-            {selectedProject && (
-              <span className="text-primary"> — {selectedProject.name}</span>
-            )}
+            {selectedProject && <span className="text-primary"> — {selectedProject.name}</span>}
           </p>
         </div>
 
@@ -146,64 +127,54 @@ const Chatbot = () => {
                 <p className="text-sm font-medium">Socialabs Assistant</p>
                 <p className="text-xs text-muted-foreground">AI-powered insights</p>
               </div>
-              {/* <div className="ml-auto flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                <span className="text-xs text-muted-foreground">Online</span>
-              </div> */}
             </CardTitle>
           </CardHeader>
 
-          {/* Messages */}
+          {/* Messages Area */}
           <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
             <AnimatePresence>
-              {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={cn(
-                    "flex gap-3",
-                    message.role === "user" ? "flex-row-reverse" : ""
+              {messages.map((message, index) => (
+                <div key={message.id} className="space-y-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={cn("flex gap-3", message.role === "user" ? "flex-row-reverse" : "")}
+                  >
+                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0", message.role === "user" ? "bg-primary" : "bg-muted")}>
+                      {message.role === "user" ? <User className="w-4 h-4 text-primary-foreground" /> : <Bot className="w-4 h-4 text-foreground" />}
+                    </div>
+                    <div className={cn("max-w-[70%] rounded-2xl px-4 py-3", message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground")}>
+                      <p className="text-sm whitespace-pre-line">{message.content}</p>
+                      <p className={cn("text-[10px] mt-2", message.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground")}>
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* TAMPILKAN SUGGESTION SETELAH BOT JAWAB (Khusus pesan terakhir bot) */}
+                  {message.role === "assistant" && index === messages.length - 1 && index > 0 && !isTyping && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-2 ml-11">
+                      {topicQuestions.map((q, i) => (
+                        <Button
+                          key={i}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSend(q)}
+                          className="text-[11px] h-auto py-1 border-primary/20 hover:bg-primary/5 rounded-full"
+                        >
+                          <Lightbulb className="w-3 h-3 mr-1 text-primary" />
+                          {q}
+                        </Button>
+                      ))}
+                    </motion.div>
                   )}
-                >
-                  <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
-                    message.role === "user" ? "bg-primary" : "bg-muted"
-                  )}>
-                    {message.role === "user" ? (
-                      <User className="w-4 h-4 text-primary-foreground" />
-                    ) : (
-                      <Bot className="w-4 h-4 text-foreground" />
-                    )}
-                  </div>
-                  <div className={cn(
-                    "max-w-[70%] rounded-2xl px-4 py-3",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
-                  )}>
-                    <p className="text-sm whitespace-pre-line">{message.content}</p>
-                    <p className={cn(
-                      "text-[10px] mt-2",
-                      message.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground"
-                    )}>
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </motion.div>
+                </div>
               ))}
             </AnimatePresence>
 
-            {/* Typing indicator */}
             {isTyping && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex gap-3"
-              >
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-foreground" />
-                </div>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><Bot className="w-4 h-4 text-foreground" /></div>
                 <div className="bg-muted rounded-2xl px-4 py-3">
                   <div className="flex gap-1">
                     <span className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -213,12 +184,11 @@ const Chatbot = () => {
                 </div>
               </motion.div>
             )}
-
             <div ref={messagesEndRef} />
           </CardContent>
 
-          {/* Suggested Questions */}
-          {messages.length <= 2 && (
+          {/* Tampilan Suggested Awal (Hanya muncul saat chat masih kosong/awal) */}
+          {messages.length <= 1 && (
             <div className="px-4 pb-2">
               <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
                 <Lightbulb className="w-3 h-3" />
@@ -226,34 +196,15 @@ const Chatbot = () => {
               </div>
               <div className="flex flex-wrap gap-2">
                 {allSuggestedQuestions.slice(0, 5).map((question, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSuggestedQuestion(question)}
-                    className="text-xs h-auto py-1.5"
-                  >
-                    {question}
-                  </Button>
+                  <Button key={index} variant="outline" size="sm" onClick={() => handleSend(question)} className="text-xs h-auto py-1.5">{question}</Button>
                 ))}
               </div>
               {mockTopics.length > 0 && (
                 <>
-                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2 mt-3">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>Questions based on trending topics:</span>
-                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2 mt-3"><TrendingUp className="w-3 h-3" /><span>Questions based on trending topics:</span></div>
                   <div className="flex flex-wrap gap-2">
                     {topicQuestions.map((question, index) => (
-                      <Button
-                        key={`topic-${index}`}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSuggestedQuestion(question)}
-                        className="text-xs h-auto py-1.5"
-                      >
-                        {question}
-                      </Button>
+                      <Button key={`topic-${index}`} variant="outline" size="sm" onClick={() => handleSend(question)} className="text-xs h-auto py-1.5">{question}</Button>
                     ))}
                   </div>
                 </>
@@ -263,27 +214,9 @@ const Chatbot = () => {
 
           {/* Input */}
           <div className="p-4 border-t border-border/50">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className="flex gap-2"
-            >
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ketik pertanyaan Anda..."
-                className="flex-1"
-                disabled={isTyping}
-              />
-              <Button
-                type="submit"
-                disabled={!input.trim() || isTyping}
-                className="gradient-primary text-primary-foreground"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+            <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex gap-2">
+              <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ketik pertanyaan Anda..." className="flex-1" disabled={isTyping} />
+              <Button type="submit" disabled={!input.trim() || isTyping} className="gradient-primary text-primary-foreground"><Send className="w-4 h-4" /></Button>
             </form>
           </div>
         </Card>

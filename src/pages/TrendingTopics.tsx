@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
 import { mockTopics, mockTweets } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, MessageSquare, Tag } from "lucide-react";
+// Tambahkan Users ke dalam import lucide-react
+import { TrendingUp, MessageSquare, Tag, Users } from "lucide-react"; 
 import { 
   Table, 
   TableBody, 
@@ -63,13 +64,30 @@ const TrendingTopics = () => {
         </p>
       </motion.div>
 
-      {/* Stats */}
+      {/* Stats - Urutan: Total Tweets (Kiri), Total Topics (Tengah), Top Topic (Kanan) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        {/* Total Tweets - Menggunakan ikon Users (Orang) */}
         <Card className="bg-card border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-primary" />
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Tweets</p>
+                <p className="text-2xl font-bold text-foreground">45,000</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Total Topics - Menggunakan ikon MessageSquare (Bubble Chat) */}
+        <Card className="bg-card border-border/50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Topics</p>
@@ -78,24 +96,13 @@ const TrendingTopics = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Top Topic */}
         <Card className="bg-card border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
-                <MessageSquare className="w-6 h-6 text-success" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Tweets</p>
-                <p className="text-2xl font-bold text-foreground">45K</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-card border-border/50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-warning" />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Top Topic</p>
@@ -120,7 +127,6 @@ const TrendingTopics = () => {
               <TableRow>
                 <TableHead className="w-[200px]">Topic</TableHead>
                 <TableHead>Description</TableHead>
-                {/* Kolom Tweets sudah dihapus dari sini */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -150,7 +156,6 @@ const TrendingTopics = () => {
                   <TableCell className="text-muted-foreground">
                     {topic.description || "No description available"}
                   </TableCell>
-                  {/* TableCell untuk tweetsCount sudah dihapus dari sini */}
                 </TableRow>
               ))}
             </TableBody>
