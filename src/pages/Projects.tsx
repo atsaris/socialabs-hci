@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useProject } from "@/context/ProjectContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; // Import Input untuk search
 import { 
   Table, 
   TableBody, 
@@ -30,7 +31,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FolderOpen, Trash2, Plus, CheckCircle2 } from "lucide-react";
+import { FolderOpen, Trash2, Plus, CheckCircle2, Search } from "lucide-react"; // Tambah icon Search
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -39,11 +40,19 @@ const ITEMS_PER_PAGE = 5;
 const Projects = () => {
   const { projects, selectedProject, setSelectedProject, deleteProject } = useProject();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState(""); // State pencarian
   const navigate = useNavigate();
 
-  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
+  // Filter pencarian berdasarkan nama, deskripsi, atau keyword
+  const filteredProjects = projects.filter((project) => 
+    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    project.keywords.some(k => k.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProjects = projects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedProjects = filteredProjects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const handleSelectProject = (project: typeof projects[0]) => {
     setSelectedProject(project);
@@ -74,11 +83,25 @@ const Projects = () => {
 
       {/* Projects Table */}
       <Card className="bg-card border-border/50">
-        <CardHeader>
+        <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4 space-y-0">
           <CardTitle className="flex items-center gap-2">
             <FolderOpen className="w-5 h-5 text-primary" />
-            All Projects ({projects.length})
+            All Projects ({filteredProjects.length})
           </CardTitle>
+
+          {/* Search Field ditambahkan di sini */}
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset ke hal 1 saat mengetik
+              }}
+              className="pl-9 bg-muted/20 border-border/50"
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -167,7 +190,7 @@ const Projects = () => {
                   <PaginationItem>
                     <PaginationPrevious 
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
+                      className={cn("cursor-pointer", currentPage === 1 && "pointer-events-none opacity-50")}
                     />
                   </PaginationItem>
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -175,6 +198,7 @@ const Projects = () => {
                       <PaginationLink
                         onClick={() => setCurrentPage(page)}
                         isActive={currentPage === page}
+                        className="cursor-pointer"
                       >
                         {page}
                       </PaginationLink>
@@ -183,7 +207,7 @@ const Projects = () => {
                   <PaginationItem>
                     <PaginationNext 
                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
+                      className={cn("cursor-pointer", currentPage === totalPages && "pointer-events-none opacity-50")}
                     />
                   </PaginationItem>
                 </PaginationContent>

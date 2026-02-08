@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
 import { mockTopics, mockTweets } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// Tambahkan Users ke dalam import lucide-react
 import { TrendingUp, MessageSquare, Tag, Users } from "lucide-react"; 
 import { 
   Table, 
@@ -40,34 +39,33 @@ const TrendingTopics = () => {
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
-      {/* Header */}
+      {/* Header Updated - Aligned Badge and Tag with H1 */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex flex-wrap items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold text-foreground">Trending Topics</h1>
+          
           {selectedProject && (
-            <Badge variant="secondary" className="text-sm">
-              <Tag className="w-3 h-3 mr-1" />
-              {getCategoryLabel(selectedProject.category)}
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 px-3 py-1 text-sm font-semibold transition-colors shadow-none">
+                {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+              </Badge>
+
+              <span className="flex items-center gap-1.5 text-primary font-medium text-sm"> 
+                — <Tag className="w-3.5 h-3.5" /> {getCategoryLabel(selectedProject.category)}
+              </span>
+            </div>
           )}
         </div>
         <p className="text-muted-foreground">
           Identify the main topics being discussed
-          {selectedProject && (
-            <span className="text-primary"> 
-              — {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
-            </span>
-          )}
         </p>
       </motion.div>
 
-      {/* Stats - Urutan: Total Tweets (Kiri), Total Topics (Tengah), Top Topic (Kanan) */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        {/* Total Tweets - Menggunakan ikon Users (Orang) */}
         <Card className="bg-card border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -82,7 +80,6 @@ const TrendingTopics = () => {
           </CardContent>
         </Card>
 
-        {/* Total Topics - Menggunakan ikon MessageSquare (Bubble Chat) */}
         <Card className="bg-card border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -97,7 +94,6 @@ const TrendingTopics = () => {
           </CardContent>
         </Card>
 
-        {/* Top Topic */}
         <Card className="bg-card border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -113,10 +109,10 @@ const TrendingTopics = () => {
         </Card>
       </div>
 
-      {/* Topics Table */}
+      {/* Topics Table - FONT SIZE INCREASED */}
       <Card className="bg-card border-border/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold">
             <TrendingUp className="w-5 h-5 text-primary" />
             Topic Analysis
           </CardTitle>
@@ -125,8 +121,9 @@ const TrendingTopics = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px]">Topic</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead className="w-[200px] text-base font-bold">Topic</TableHead>
+                <TableHead className="text-base font-bold">Description</TableHead>
+                <TableHead className="text-right text-base font-bold">Tweets</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -141,10 +138,10 @@ const TrendingTopics = () => {
                       : "hover:bg-muted/50"
                   )}
                 >
-                  <TableCell className="font-medium">
+                  <TableCell className="text-base font-semibold text-foreground py-4">
                     <div className="flex items-center gap-2">
                       <span className={cn(
-                        "w-2 h-2 rounded-full",
+                        "w-2.5 h-2.5 rounded-full", // Sedikit diperbesar dot-nya
                         index === 0 ? "bg-primary" :
                         index === 1 ? "bg-success" :
                         index === 2 ? "bg-warning" :
@@ -153,8 +150,13 @@ const TrendingTopics = () => {
                       {topic.name}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  
+                  <TableCell className="text-base text-foreground font-medium py-4">
                     {topic.description || "No description available"}
+                  </TableCell>
+                  
+                  <TableCell className="text-right text-base font-normal text-muted-foreground py-4">
+                    {topic.tweetsCount.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
@@ -168,7 +170,9 @@ const TrendingTopics = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-primary" />
-            Tweets {selectedTopic && `— ${selectedTopic}`}
+            <span className="text-xl font-bold">
+              Tweets {selectedTopic && `— ${selectedTopic}`}
+            </span>
             {selectedTopic && (
               <button
                 onClick={() => setSelectedTopic(null)}

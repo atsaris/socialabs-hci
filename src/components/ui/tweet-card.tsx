@@ -7,13 +7,16 @@ import { format } from "date-fns";
 interface TweetCardProps {
   tweet: Tweet;
   className?: string;
+  hideLabel?: boolean; // Fitur untuk ngilangin label di hal. Emotion
 }
 
+// Balikin ke warna dasar Sentiment (Green & Red)
 const sentimentColors = {
   positive: "border-l-success",
   negative: "border-l-destructive",
 };
 
+// Map emoji berdasarkan emosi (tetap dipakai untuk icon kecil)
 const emotionEmojis: Record<string, string> = {
   joy: "😊",
   anger: "😤",
@@ -23,7 +26,7 @@ const emotionEmojis: Record<string, string> = {
   disgust: "🤢",
 };
 
-export function TweetCard({ tweet, className }: TweetCardProps) {
+export function TweetCard({ tweet, className, hideLabel }: TweetCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -76,17 +79,21 @@ export function TweetCard({ tweet, className }: TweetCardProps) {
           </div>
         </div>
         
-        <div className="flex flex-col items-end gap-2">
-          <span className="text-2xl">{emotionEmojis[tweet.emotion]}</span>
-          <span className={cn(
-            "text-xs px-2 py-1 rounded-full font-medium",
-            tweet.sentiment === "positive" && "bg-success/10 text-success",
-            tweet.sentiment === "negative" && "bg-destructive/10 text-destructive"
-          )}>
-            {tweet.sentiment}
-          </span>
-        </div>
+        {/* LOGIKA LABEL: Balik ke Sentiment (Positive/Negative) */}
+        {!hideLabel && (
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <span className="text-2xl">{emotionEmojis[tweet.emotion.toLowerCase()]}</span>
+            <span className={cn(
+              "text-xs px-2 py-1 rounded-full font-medium capitalize",
+              tweet.sentiment === "positive" ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+            )}>
+              {tweet.sentiment}
+            </span>
+          </div>
+        )}
       </div>
     </motion.div>
   );
 }
+
+export default TweetCard;

@@ -1,15 +1,21 @@
 import { motion } from "framer-motion";
 import { TweetCard } from "@/components/ui/tweet-card";
-import { mockTweets, sentimentData, positiveWords, negativeWords } from "@/data/mockData";
+import { Button } from "@/components/ui/button";
+import { mockTweets, sentimentData, positiveWords, negativeWords, mockTopics } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, ThumbsUp, ThumbsDown, MessageSquare, Tag, Users } from "lucide-react";
+import { Heart, ThumbsUp, ThumbsDown, MessageSquare, Tag, Users, Filter, ChevronDown } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { useState } from "react";
 import { useProject } from "@/context/ProjectContext";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// Fungsi untuk merender label persentase statis di dalam Pie Chart
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -30,7 +36,6 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   );
 };
 
-// Word Cloud Component
 const WordCloud = ({ 
   words, 
   color, 
@@ -43,11 +48,13 @@ const WordCloud = ({
   setHoveredWord: (word: string | null) => void;
 }) => {
   const maxCount = Math.max(...words.map(w => w.count));
+  const minCount = Math.min(...words.map(w => w.count));
   
   return (
-    <div className="flex flex-wrap gap-2 justify-center items-center p-4 min-h-[200px]">
+    <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center items-center p-6 min-h-[250px]">
       {words.map((word, index) => {
-        const size = 0.7 + (word.count / maxCount) * 1.3;
+        const ratio = (word.count - minCount) / (maxCount - minCount || 1);
+        const size = 0.8 + (ratio * 2.7); 
         const isHovered = hoveredWord === word.text;
         
         return (
@@ -55,20 +62,20 @@ const WordCloud = ({
             key={word.text}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.05 }}
+            transition={{ delay: index * 0.03 }}
             className="relative"
             onMouseEnter={() => setHoveredWord(word.text)}
             onMouseLeave={() => setHoveredWord(null)}
           >
             <span
               className={cn(
-                "cursor-default transition-all duration-200 font-medium",
-                isHovered && "underline"
+                "cursor-default transition-all duration-300 font-bold tracking-tight block leading-none",
+                isHovered ? "opacity-100 scale-110" : "opacity-80 hover:opacity-100"
               )}
               style={{
                 fontSize: `${size}rem`,
-                // UBAH DISINI: Warna langsung menggunakan 'color' asli tanpa opacity 99
                 color: color,
+                textShadow: isHovered ? `0 0 20px ${color}44` : 'none'
               }}
             >
               {word.text}
@@ -77,7 +84,7 @@ const WordCloud = ({
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-popover border border-border px-2 py-1 rounded text-xs whitespace-nowrap z-10"
+                className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-popover border border-border px-3 py-1.5 rounded-lg shadow-xl text-xs font-bold whitespace-nowrap z-10"
               >
                 {word.count.toLocaleString()} tweets
               </motion.div>
@@ -91,6 +98,7 @@ const WordCloud = ({
 
 const SentimentAnalysis = () => {
   const [selectedSentiment, setSelectedSentiment] = useState<string | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<string>("All Topics");
   const [hoveredWord, setHoveredWord] = useState<string | null>(null);
   const { selectedProject } = useProject();
 
@@ -99,8 +107,8 @@ const SentimentAnalysis = () => {
     : mockTweets;
 
   const sentimentStats = [
-    { label: "Positive", value: 64, icon: ThumbsUp, color: "text-success", bg: "bg-success/10" },
-    { label: "Negative", value: 36, icon: ThumbsDown, color: "text-destructive", bg: "bg-destructive/10" },
+    { label: "Positive", value: 64, emoji: "😊", color: "text-success", bg: "bg-success/10" },
+    { label: "Negative", value: 36, emoji: "☹️", color: "text-destructive", bg: "bg-destructive/10" },
   ];
 
   const getCategoryLabel = (category: string) => {
@@ -118,38 +126,66 @@ const SentimentAnalysis = () => {
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-bold text-foreground">Sentiment Analysis</h1>
-          {selectedProject && (
-            <Badge variant="secondary" className="text-sm">
-              <Tag className="w-3 h-3 mr-1" />
-              {getCategoryLabel(selectedProject.category)}
-            </Badge>
-          )}
-        </div>
-        <p className="text-muted-foreground">
-          Analyze audience sentiment towards the discussed context
-          {selectedProject && (
-            <span className="text-primary"> 
-              — {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
-            </span>
-          )}
-        </p>
-      </motion.div>
+      {/* Header Updated - Aligning Badge and Tag on the same line */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold text-foreground">Sentiment Analysis</h1>
+            
+            {selectedProject && (
+              <div className="flex items-center gap-3">
+                {/* Badge Project Name - Style Keywords Biru Muda */}
+                <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 px-3 py-1 text-sm font-semibold transition-colors shadow-none">
+                  {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+                </Badge>
 
-      {/* Stats Grid: Total Tweets (Kiri) + Sentiment Stats */}
+                {/* Tag Category disamping Badge */}
+                <span className="flex items-center gap-1.5 text-primary font-medium text-sm"> 
+                  — <Tag className="w-3.5 h-3.5" /> {getCategoryLabel(selectedProject.category)}
+                </span>
+              </div>
+            )}
+          </div>
+          <p className="text-muted-foreground">
+            Analyze audience sentiment towards the discussed context
+          </p>
+        </motion.div>
+
+        <div className="flex-shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2 border border-border/50 bg-card hover:bg-muted text-white transition-all h-11 px-5 rounded-xl shadow-sm">
+                <Filter className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold">{selectedTopic}</span>
+                <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-card border-border shadow-2xl rounded-xl p-1.5">
+              <DropdownMenuItem 
+                onClick={() => setSelectedTopic("All Topics")}
+                className="cursor-pointer hover:bg-primary hover:text-white rounded-lg transition-colors font-semibold px-3 py-2.5 mb-1"
+              >
+                All Topics
+              </DropdownMenuItem>
+              {mockTopics.map((topic) => (
+                <DropdownMenuItem 
+                  key={topic.id}
+                  onClick={() => setSelectedTopic(topic.name.replace('#', ''))}
+                  className="cursor-pointer hover:bg-primary hover:text-white rounded-lg transition-colors capitalize font-semibold px-3 py-2.5"
+                >
+                  {topic.name.replace('#', '')}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Card Total Tweets */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          // whileHover={{ scale: 1.02 }}
-          className="rounded-2xl p-6 bg-card border border-border/50 transition-all shadow-sm"
+          className="rounded-2xl p-6 bg-card border border-border/50 shadow-sm"
         >
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -161,43 +197,12 @@ const SentimentAnalysis = () => {
             </div>
           </div>
         </motion.div>
-
-        {/* Sentiment Stats */}
-        {sentimentStats.map((stat) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.02 }}
-            onClick={() => setSelectedSentiment(
-              selectedSentiment === stat.label.toLowerCase() ? null : stat.label.toLowerCase()
-            )}
-            className={cn(
-              "cursor-pointer rounded-2xl p-6 bg-card border transition-all",
-              selectedSentiment === stat.label.toLowerCase()
-                ? "border-primary ring-2 ring-primary/20"
-                : "border-border/50 hover:border-primary/30"
-            )}
-          >
-            <div className="flex items-center gap-4">
-              <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center", stat.bg)}>
-                <stat.icon className={cn("w-7 h-7", stat.color)} />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="text-3xl font-bold text-foreground">{stat.value}%</p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Pie Chart */}
         <Card className="bg-card border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl font-bold">
               <Heart className="w-5 h-5 text-primary" />
               Sentiment Distribution
             </CardTitle>
@@ -213,8 +218,6 @@ const SentimentAnalysis = () => {
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
-                    innerRadius={0}
-                    paddingAngle={0}
                     labelLine={false}
                     label={renderCustomizedLabel}
                   >
@@ -222,16 +225,16 @@ const SentimentAnalysis = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip          
-                  separator="" // Menghilangkan tanda titik dua (:)
-                   formatter={(value: number) => [`${(value * 450).toLocaleString()} Tweets`, ""]} // Mengosongkan nama label
-                  contentStyle={{
-                   backgroundColor: "hsl(222, 47%, 8%)",
-                  border: "1px solid hsl(222, 30%, 18%)",
-                  borderRadius: "8px",
-                  color: "#fff"
-                   }}
-                  itemStyle={{ color: "#fff" }}
+                  <Tooltip 
+                    separator=""
+                    formatter={(value: number) => [`${(value * 450).toLocaleString()} Tweets`, ""]}
+                    contentStyle={{
+                      backgroundColor: "hsl(222, 47%, 8%)",
+                      border: "1px solid hsl(222, 30%, 18%)",
+                      borderRadius: "8px",
+                      color: "#fff"
+                    }}
+                    itemStyle={{ color: "#fff" }}
                   />
                   <Legend />
                 </PieChart>
@@ -240,10 +243,9 @@ const SentimentAnalysis = () => {
           </CardContent>
         </Card>
 
-        {/* Positive Word Cloud */}
         <Card className="bg-card border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl font-bold">
               <ThumbsUp className="w-5 h-5 text-success" />
               Positive Words
             </CardTitle>
@@ -258,10 +260,9 @@ const SentimentAnalysis = () => {
           </CardContent>
         </Card>
 
-        {/* Negative Word Cloud */}
         <Card className="bg-card border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl font-bold">
               <ThumbsDown className="w-5 h-5 text-destructive" />
               Negative Words
             </CardTitle>
@@ -277,12 +278,47 @@ const SentimentAnalysis = () => {
         </Card>
       </div>
 
-      {/* Tweets by Sentiment */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sentimentStats.map((stat) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.02 }}
+            onClick={() => setSelectedSentiment(
+              selectedSentiment === stat.label.toLowerCase() ? null : stat.label.toLowerCase()
+            )}
+            className={cn(
+              "cursor-pointer rounded-2xl p-6 bg-card border transition-all shadow-sm",
+              selectedSentiment === stat.label.toLowerCase()
+                ? "border-primary ring-2 ring-primary/20"
+                : "border-border/50 hover:border-primary/30"
+            )}
+          >
+            <div className="flex items-center gap-4">
+              <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-4xl", stat.bg)}>
+                {stat.emoji}
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <p className="text-3xl font-bold text-foreground">{stat.value}%</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
       <Card className="bg-card border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-primary" />
-            Tweets {selectedSentiment && `— ${selectedSentiment.charAt(0).toUpperCase() + selectedSentiment.slice(1)}`}
+            <span className="text-xl font-bold">
+              Tweets {selectedSentiment && (
+                <span className="ml-2">
+                   — {selectedSentiment === "positive" ? "😊 " : "☹️ "}{selectedSentiment.charAt(0).toUpperCase() + selectedSentiment.slice(1)}
+                </span>
+              )}
+            </span>
             {selectedSentiment && (
               <button
                 onClick={() => setSelectedSentiment(null)}
@@ -295,7 +331,7 @@ const SentimentAnalysis = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {filteredTweets.map((tweet) => (
-            <TweetCard key={tweet.id} tweet={tweet} />
+            <TweetCard key={tweet.id} tweet={tweet} hideLabel={true} />
           ))}
         </CardContent>
       </Card>

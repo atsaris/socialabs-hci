@@ -49,7 +49,6 @@ const categories = [
 const languages = [
   { value: "id", label: "Indonesian", flag: "🇮🇩" },
   { value: "en", label: "English", flag: "🇺🇸" },
-  { value: "all", label: "All Languages", flag: "🌐" },
 ];
 
 const CreateProject = () => {
@@ -130,7 +129,6 @@ const CreateProject = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto"
       >
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Create New Project</h1>
           <p className="text-muted-foreground">
@@ -138,7 +136,6 @@ const CreateProject = () => {
           </p>
         </div>
 
-        {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
@@ -183,7 +180,6 @@ const CreateProject = () => {
           </div>
         </div>
 
-        {/* Form Card */}
         <Card className="bg-card border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -205,17 +201,17 @@ const CreateProject = () => {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
-                {/* Step 1: Project Info */}
                 {currentStep === 1 && (
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="name">Project Name *</Label>
+                      {/* UPDATE: Paksa background tetap gelap dengan !bg-muted/50 */}
                       <Input
                         id="name"
                         placeholder="e.g., Persib Bandung Analysis"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="mt-2"
+                        className="mt-2 !bg-muted/50 border-border/50 text-foreground focus:!bg-muted/50"
                       />
                     </div>
                     <div>
@@ -225,13 +221,12 @@ const CreateProject = () => {
                         placeholder="Describe your analysis goals..."
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="mt-2 min-h-[120px]"
+                        className="mt-2 min-h-[120px] !bg-muted/50 border-border/50 focus:!bg-muted/50"
                       />
                     </div>
                   </div>
                 )}
 
-                {/* Step 2: Category */}
                 {currentStep === 2 && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -253,8 +248,6 @@ const CreateProject = () => {
                         </motion.div>
                       ))}
                     </div>
-                    
-                    {/* Custom Category Input */}
                     {formData.category === "others" && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -267,14 +260,13 @@ const CreateProject = () => {
                           placeholder="Enter your category name..."
                           value={formData.customCategory}
                           onChange={(e) => setFormData({ ...formData, customCategory: e.target.value })}
-                          className="mt-2"
+                          className="mt-2 !bg-muted/50 border-border/50 focus:!bg-muted/50"
                         />
                       </motion.div>
                     )}
                   </div>
                 )}
 
-                {/* Step 3: Keyword (Single) */}
                 {currentStep === 3 && (
                   <div className="space-y-4">
                     <div>
@@ -284,7 +276,7 @@ const CreateProject = () => {
                         placeholder="Enter a single keyword..."
                         value={formData.keyword}
                         onChange={(e) => setFormData({ ...formData, keyword: e.target.value })}
-                        className="mt-2"
+                        className="mt-2 !bg-muted/50 border-border/50 focus:!bg-muted/50"
                       />
                     </div>
                     {formData.keyword && (
@@ -301,9 +293,8 @@ const CreateProject = () => {
                   </div>
                 )}
 
-                {/* Step 4: Language */}
                 {currentStep === 4 && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {languages.map((lang) => (
                       <motion.div
                         key={lang.value}
@@ -324,7 +315,6 @@ const CreateProject = () => {
                   </div>
                 )}
 
-                {/* Step 5: Date Range */}
                 {currentStep === 5 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -334,7 +324,7 @@ const CreateProject = () => {
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal",
+                              "w-full justify-start text-left font-normal !bg-muted/50 border-border/50",
                               !formData.startDate && "text-muted-foreground"
                             )}
                           >
@@ -360,7 +350,7 @@ const CreateProject = () => {
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal",
+                              "w-full justify-start text-left font-normal !bg-muted/50 border-border/50",
                               !formData.endDate && "text-muted-foreground"
                             )}
                           >
@@ -383,7 +373,6 @@ const CreateProject = () => {
                   </div>
                 )}
 
-                {/* Step 6: Review */}
                 {currentStep === 6 && (
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -443,7 +432,6 @@ const CreateProject = () => {
               </motion.div>
             </AnimatePresence>
 
-            {/* Navigation Buttons */}
             <div className="flex justify-between mt-8">
               <Button
                 variant="outline"

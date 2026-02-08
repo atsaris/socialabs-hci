@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   MessageSquare, TrendingUp, Smile, 
-  Users, BarChart3, Tag, ArrowUpRight 
+  Crown, BarChart3, Tag, ArrowUpRight 
 } from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
 import { 
@@ -72,7 +72,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard title="Total Tweets" value="45,000" icon={MessageSquare} />
         <StatCard title="Overall Sentiment" value="Positive" icon={Smile} />
-        <StatCard title="Top Influencer" value="@bandungfootball" icon={Users} />
+        <StatCard title="Top Influencer" value="@bandungfootball" icon={Crown} />
         <StatCard title="Identified Topics" value={mockTopics.length} icon={TrendingUp} />
       </div>
 

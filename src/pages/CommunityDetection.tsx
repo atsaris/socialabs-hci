@@ -61,7 +61,6 @@ const CommunityDetection = () => {
         color: community.color,
         isInfluencer: true,
         communityId: community.id,
-        // Tambahkan profil URL di sini (mengasumsikan username diawali @ atau string murni)
         profileUrl: `https://x.com/${inf.username.replace('@', '')}`
       });
 
@@ -142,15 +141,39 @@ const CommunityDetection = () => {
     ? mockCommunities.find(c => c.id === selectedCommunity)?.name 
     : "All Communities";
 
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      sports: "Sports",
+      politics: "Politics",
+      business: "Business",
+      technology: "Technology",
+      entertainment: "Entertainment",
+      health: "Health",
+      education: "Education",
+    };
+    return labels[category] || category;
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-8">
+      {/* Header Updated - Sesuai dengan style Influencer Page */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex flex-wrap items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold text-foreground">Community Detection</h1>
-          <Badge variant="secondary" className="text-sm bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
-            <Tag className="w-3 h-3 mr-1" />
-            Layvin Kurzawa
-          </Badge>
+          
+          {selectedProject && (
+            <div className="flex items-center gap-3">
+              {/* Badge Project Name - Style Keywords */}
+              <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 px-3 py-1 text-sm font-semibold transition-colors shadow-none">
+                {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
+              </Badge>
+
+              {/* Tag Category disamping Badge */}
+              <span className="flex items-center gap-1.5 text-primary font-medium text-sm"> 
+                — <Tag className="w-3.5 h-3.5" /> {getCategoryLabel(selectedProject.category)}
+              </span>
+            </div>
+          )}
         </div>
         <p className="text-muted-foreground">
           Identify groups and influencers involved in the discussion
@@ -256,16 +279,12 @@ const CommunityDetection = () => {
               ctx.globalAlpha = 1;
             }}
             onNodeClick={(node: any) => {
-              // Jika yang diklik adalah influencer
               if (node.isInfluencer) {
-                // Jika komunitas ini sudah terpilih (klik kedua kali), buka profil X
                 if (selectedCommunity === node.communityId) {
                   window.open(node.profileUrl, '_blank');
                   return;
                 }
               }
-
-              // Aksi standar: Filter komunitas dan Zoom
               setSelectedCommunity(node.communityId);
               graphRef.current?.centerAt(node.x, node.y, 1000);
               graphRef.current?.zoom(2, 1000);
