@@ -14,6 +14,7 @@ import {
 import { sentimentData, mockTopics, emotionData } from "@/data/mockData";
 import { useNavigate } from "react-router-dom";
 
+// ... (renderCustomizedLabel tetap sama)
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -78,11 +79,11 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* 1. Sentiment Distribution */}
+        {/* 1. Sentiment Distribution - Judul diubah ke text-base */}
         <Card className="bg-card border-border/50 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Smile className="w-4 h-4 text-primary" />
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Smile className="w-5 h-5 text-primary" />
               Sentiment Distribution
             </CardTitle>
             <button 
@@ -122,11 +123,11 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* 2. Emotion Comparison */}
+        {/* 2. Emotion Comparison - Judul diubah ke text-base */}
         <Card className="bg-card border-border/50 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-primary" />
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary" />
               Emotion Comparison
             </CardTitle>
             <button 
@@ -167,11 +168,11 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* 3. Top Trending Topics - Tanpa Hashtag & Angka */}
+        {/* 3. Top Trending Topics - Judul diubah ke text-base */}
         <Card className="bg-card border-border/50 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
               Top Trending Topics
             </CardTitle>
             <button 
@@ -188,11 +189,9 @@ const Dashboard = () => {
                 className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-border/50 hover:border-primary/30 transition-all cursor-pointer" 
                 onClick={() => navigate("/trending-topics")}
               >
-                {/* Menghilangkan '#' dan merapikan teks */}
                 <span className="font-semibold text-primary text-sm capitalize">
                   {topic.name.replace('#', '')}
                 </span>
-                {/* Badge Angka sudah dihapus */}
               </div>
             ))}
           </CardContent>

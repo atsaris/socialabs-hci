@@ -47,7 +47,7 @@ const InfluencerRecommendation = () => {
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
-      {/* Header - Semua elemen konteks pindah ke baris judul */}
+      {/* Header - Sudah Update Sejajar */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,26 +57,22 @@ const InfluencerRecommendation = () => {
           
           {selectedProject && (
             <div className="flex items-center gap-3">
-              {/* Badge Project Name */}
               <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 px-3 py-1 text-sm font-semibold transition-colors shadow-none">
                 {selectedProject.name === "Persib Bandung" ? "Layvin Kurzawa" : selectedProject.name}
               </Badge>
 
-              {/* Tag Category disamping Badge */}
               <span className="flex items-center gap-1.5 text-primary font-medium text-sm"> 
                 — <Tag className="w-3.5 h-3.5" /> {getCategoryLabel(selectedProject.category)}
               </span>
             </div>
           )}
         </div>
-        
-        {/* Deskripsi jadi lebih clean */}
         <p className="text-muted-foreground">
           Identify the most influential people in the discussed context
         </p>
       </motion.div>
 
-      {/* Stats Section Tetap Sama */}
+      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard title="Total Influencers" value="4" icon={Users} />
         <StatCard title="Top Influencer" value="@bandungfootball" icon={Crown} />
@@ -84,7 +80,31 @@ const InfluencerRecommendation = () => {
         <StatCard title="Total Reach" value="8,125" icon={Award} />
       </div>
 
-      {/* Leaderboard & Cards Tetap Sama (Style Aman) */}
+      {/* INI YANG TADI HILANG: Top Performers (4 Cards) */}
+      <Card className="bg-card border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl font-bold">
+            <Crown className="w-5 h-5 text-primary" />
+            Top Influencers
+          </CardTitle>
+          <p className="text-m text-muted-foreground">
+              Ranking is determined based on the volume of mentions and retweets within the network.
+            </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {mockInfluencers.slice(0,4).map((influencer, index) => (
+              <InfluencerCard
+                key={influencer.id}
+                influencer={influencer}
+                rank={index + 1}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Leaderboard Section */}
       <Card className="bg-card border-border/50">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="flex items-center gap-2 text-xl font-bold">
@@ -108,8 +128,8 @@ const InfluencerRecommendation = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>
+
         <CardContent>
-          {/* ... content list influencer ... */}
           <div className="space-y-3">
             {sortedInfluencers.map((influencer, index) => (
               <motion.div
@@ -132,6 +152,7 @@ const InfluencerRecommendation = () => {
                   <p className="font-medium text-foreground">{influencer.displayName}</p>
                   <p className="text-sm text-muted-foreground">@{influencer.username}</p>
                 </div>
+                
                 <div className="text-right hidden md:block pl-4">
                   <p className={cn("font-medium text-foreground", sortBy === "followers" && "text-primary")}>
                     {influencer.followers >= 1000000 ? `${(influencer.followers / 1000000).toFixed(1)}M` : `${(influencer.followers / 1000).toFixed(0)}K`}

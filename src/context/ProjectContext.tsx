@@ -59,7 +59,7 @@ const initialProjects: Project[] = [
     description: "Tracking discussions about artificial intelligence development",
     category: "technology",
     keywords: ["ChatGPT"],
-    language: "all",
+    language: "en",
     startDate: new Date("2024-01-10"),
     endDate: new Date("2024-02-10"),
     status: "completed",
